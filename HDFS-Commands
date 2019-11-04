@@ -1,0 +1,19 @@
+1. to check the blocks location for files in hdfs
+hdfs fsck <path>
+          [-list-corruptfileblocks |
+          [-move | -delete | -openforwrite]
+          [-files [-blocks [-locations | -racks]]]
+          [-includeSnapshots]
+COMMAND_OPTION	Description
+path	Start checking from this path.
+-delete	Delete corrupted files.
+-files	Print out files being checked.
+-files -blocks	Print out the block report
+-files -blocks -locations	Print out locations for every block.
+-files -blocks -racks	Print out network topology for data-node locations.
+-includeSnapshots	Include snapshot data if the given path indicates a snapshottable directory or there are snapshottable directories under it.
+-list-corruptfileblocks	Print out list of missing blocks and files they belong to.
+-move	Move corrupted files to /lost+found.
+-openforwrite	Print out files opened for write.
+
+
