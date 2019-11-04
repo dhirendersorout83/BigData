@@ -1,0 +1,8 @@
+1. To Enable dynamic partition and buckting, use below commands 
+set hive.exec.dynamic.partition=true;
+set hive.exec.dynamic.partition.mode=nonstrict;
+set hive.exec.max.dynamic.partitions=3000;
+set hive.exec.max.dynamic.partitions.pernode=3000;
+===============================================================
+2. Dynamic Partitioning in Hive
+
