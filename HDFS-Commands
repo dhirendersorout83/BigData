@@ -15,5 +15,11 @@ path	Start checking from this path.
 -list-corruptfileblocks	Print out list of missing blocks and files they belong to.
 -move	Move corrupted files to /lost+found.
 -openforwrite	Print out files opened for write.
-
+============================================================
+2. check disk space in hdfs
+du -hT
+du -sch /* | grep G
+============================================================
+3. exit safe mode of namenode
+sudo -u hdfs hadoop dfsadmin -safemode leave
 
