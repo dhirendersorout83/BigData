@@ -1,0 +1,309 @@
+1. Which among the following is an advantage of HBase over HDFS??
+HDFS does not provide low latency retrieval data. MapReduce is used to read data directly from HDFS in a sequential manner.
+=================
+2. Some facts
+An open source code of the Google Bigtable led to the development of Apache HBase"
+Google Bigtable gives client dynamic control over data layout and format
+HBase Columns do not have any specific data type and all the data in HBase is stored in the form of bytes.
+==================
+3. Data Model of HBase
+In HBase, data is stored in tables which are nothing but a collection of rows. In an HBase table, a row is a collection of column families.  A column family is a collection of related columns known as column qualifiers, and there can be any number of columns in a single column family.
+Every entry in an HBase table is identified and indexed by a RowKey, and for each RowKey, an unlimited number of columns can be stored. This feature ensures that the schema of an HBase table is flexible and the table can scale linearly.
+Each column can have a configurable number of versions and there is a provision for selecting data from a particular version. In HBase, each version is identified by a timestamp and each column has one or more versions. If the version is not mentioned in the query and mutiple versions exist, then by default the latest value is picked.
+To get particular data row, we must know rowkey,column-family,column-qualifier(column) and version
+====================
+4. Consider the logical view of an 'Employee' table, as shown in the below image.
+
+
+Employee Table: Logical view
+ 
+
+Points to note here are:
+
+1. The Contact column family is configured to store 2 versions of each value.
+2. The Rowkey row1 contains both the versions of the values in  Mobile and Email columns.
+3. row2 contains two versions of the value stored in Mobile column and one version of the value in Email,
+the other version of Email value is left blank.
+4. row3 contains only one version of the values stored in Mobile and Email columns, others are left blank.
+5. row2 doesn't have a DOJ value.
+
+Points to note here are:
+1. Since RDBMS doesn't support storing multiple versions of a value, the table only has the latest versions of all the values.
+2. The Field which was blank in the 'Employee' table, is assigned a null value. Since the memory for every row is preallocated,
+The null value is eating up some memory. This is a major problem in RDBMS systems. Now imagine an optional field in your website/forms,
+for which you have created a table on an RDBMS database. Since the optional fields are most likely to be left blank by the users,
+the particular columns related to those optional fields will result in a table full of null values,
+(sparse table) wasting a lot of memory.
+ 
+HBase solves these problems by storing values in columnar tables. Look at the HBase columnar table below for the 'Employee' table.
+
+Points to Note are:
+1. The Timestamp is the time when the particular value was written in HBase.
+2. Mutiple versions of a particular value are distinguished by their timestamps.
+2. All the empty fields(including unfilled versions) from the Logical view of the table are not stored in the table. This is how HBase allows adding columns on the fly efficiently.
+3. Hence the Unique key in this view for a value stored in an HBase table is  <RowKey, ColumnFamily:ColumnQualifier, TimeStamp>. This is the reason why the HBase data model is called a multi-dimensional map.
+4. To facilitate faster lookups, all the values are sorted w.r.t. the Key.
+
+Now, you have learnt that HBase stores data as sorted key-value pairs, to allow random and fast lookups it uses the Binary Search Algorithm.
+
+============================
+5. The shell commands of HBase demonstrated in the video are as follows:
+List: This command is used to check all the tables present in your HBase instance.
+list
+
+Create: This command is used to create a table. To create a table you must name the table and define its schema. As a part of the schema, you are required to specify the column families. However, columns are defined later while inserting records into the HBase table.
+Syntax:
+create ‘<table_name>’, ‘<column_family_name>’
+create ‘Students’, ‘Personal Details’, ‘Contact Details’, ‘Marks’
+
+Scan:  This command is used to view the contents of a table created. The optional parameters in syntax include TIMERANGE, FILTER, TIMESTAMP, LIMIT, MAXLENGTH, COLUMNS, CACHE, STARTROW and STOPROW.
+Syntax:  
+scan ‘<table_name>’ {Optional parameters}
+
+Put:  This command is used to add or update a cell value in the mentioned table. Each cell in a table is identified by a row id and a column name. Single Put command can add only a single cell value to an HBase table. 
+Syntax:
+put ‘<table_name>’, ‘<row_key>’, ‘<column_value>’, ‘<value>’
+put ‘Students’, ‘Student1’, ‘Personal Details:Name’, ‘Sandeep’
+put ‘Students’, ‘Student1’, ‘Personal Details:Email’, ‘sandeep@pqr.com’
+
+Note: If we observe the “Put command”, we can understand that columns are defined while inserting records into the HBase table. (The column 'Name' is defined while inserting the name 'Sandeep'). 
+
+get: This command is used to fetch data from HBase. There are various ways to make use of the get command.
+Syntax:  
+get ‘<table_name>’, ‘<row_key>’, {‘<Additional Parameters>’}
+
+Note:  “<Additional Parameters>” mentioned in the syntax include TIMERANGE, TIMESTAMP, VERSIONS and FILTERS.
+
+get ‘Students’, ‘Student1’
+get ‘Students’, ‘Student1’, {COLUMN => ‘Personal Details’}
+get ‘Students’, ‘Student1’, {COLUMN => ‘Personal Details:Name’}
+
+delete:  This command is used to delete a cell in HBase table.
+Syntax:  
+delete ‘<table_name>’, ‘<row_key>’, ‘<column_value>’, ‘<value>’
+delete ‘Students’, ‘Student1’, ‘Personal Details:Email’
+
+describe: This command is used to check the schema of the HBase tables.
+ Syntax:
+describe '<table_name>'
+
+alter: This command is used to modify the specifications of an HBase table like adding column families, updating the version number of column families. It can also be used to delete a column family by applying the delete method to it.
+Syntax (Modify the number of versions):
+alter ‘<table_name>’, NAME=>’<column_family_name>’, VERSIONS => <new_version_number>
+alter ‘<table_name>’, {NAME=>’<column_family_name>’, VERSIONS => <new_version_number>}, {NAME=>’<column_family_name>’, VERSIONS => <new_version_number>}
+alter ‘<table_name>’, NAME=>’<column_family_name>’, METHOD => <’delete’> 
+or 
+alter ‘<table_name>’, ‘delete’ => ‘<column_family_name>’
+
+exists:  This command is used to verify whether a given table is present in the HBase storage or not.
+Syntax:
+exists '<table name>'
+
+drop:  This command is used to delete a table in HBase. But this operator cannot be applied directly to the table. Instead, the table is first disabled. And then it is dropped.
+Syntax:  
+Step 1: Disable the table
+disable ‘<table_name>’
+Step 2:  Drop(delete) the disabled table
+drop ‘<table_name>’
+
+truncate:  This command is used to remove all the data from the table (Note that we do not intend to delete the table, just the data that is stored in the table). Internally, this command disables the table, drops it and then again recreates it. The end result is that the table’s data is removed.
+Syntax:  
+truncate ‘<table_name>’
+Note:  “Scan” command helps to verify whether the contents of a table are deleted or not.
+
+Get data based on Timestamp: The “get” command can also be used to retrieve past versions of records based on timestamp.
+Syntax:
+get ‘<table_name>’, '<row_key>', {COLUMN => ‘<column_family_name>’, TIMESTAMP => value}
+
+
+count:  This command is used to count the number of rows present in the table.
+Syntax:
+count ‘<table_name>’
+
+========================================
+6. Get data based on the filter condition: In HBase, fetching data based on a filtering condition is achieved by using Filters. In HBase, filters are like java methods which take two input parameters that are, a logical operator and a comparator. The logical operator specifies the type of the test, i.e. equals, less than, etc. The comparator is the number/value against which you wish to compare your record. Some commonly used filter functions are:
+ValueFilter: A ValueFilter takes a comparison operator and a comparator as the parameter. It compares each value with the comparator using the comparison operator. If the check is true, then the result is displayed on the console.
+Syntax:
+ValueFilter (<compareOp>, ‘<value_comparator>’)
+Example of using ValueFilter with Scan command: Let us consider an example of an HBase table named “Companies” maintained 
+by the placement cell of a college, which contains the details of all the companies that visit the college every year. 
+Check whether the company “UpGrad” exists in that table or not.
+Command:
+scan ‘Companies’, {FILTER => “ValueFilter(=, ‘binary:UpGrad’)”}
+
+QualifierFilter: A QualifierFilter also takes two parameters: comparison operator and comparator.  
+Each qualifier name is compared with the comparator using the compare operator, and if the comparison is true, 
+it returns the key-values in that column.
+Syntax:
+QualifierFilter (<compareOp>, ‘<qualifier_comparator>’)
+Example of using QualifierFilter with Scan command: Let us consider an example of an HBase table named “Companies” maintained by the placement cell of a college, which contains the details of all the companies that visit the college every year. To fetch all the names of the companies present in the table(In the given HBase table, the names of the companies are present in the column named as “Name”).
+Command:
+scan ‘Companies’, {FILTER => “QualifierFilter(=, ‘substring:Name’)”}
+
+FamilyFilter: A FamilyFilter is used to fetch key-values for a specified column family.       Syntax:
+FamilyFilter (<compareOp>, ‘<family_comparator>’)
+Example of using FamilyFilter with Scan command: Let us consider an example of an HBase table named “Companies” 
+maintained by the placement cell of a college, which contains the details of all the companies that visit the college every year. 
+Fetch the contact details (which include the mobile number, Email ID etc.) of all the companies present 
+in the table(In the given HBase table, the names of the companies are present in the column family named as “Contact Details”).
+Command:
+scan ‘<table_name>’, {FILTER => “FamilyFilter(=, substring:Contact Details’)”}
+
+====================================================
+7. Logical Operators, Comparison Operators and Comparators
+Filters can be combined together with logical operators. Some filters take a combination of comparison operators and comparators. Following is the list of each.
+
+Logical Operators
+AND - the key-value must pass both the filters to be included in the results.
+OR - the key-value must pass at least one of the filters to be included in the results.
+SKIP - for a particular row, if any of the key-values do not pass the filter condition, the entire row is skipped.
+WHILE - For a particular row, it continues to emit key-values until a key-value is reached that fails the filter condition.
+Compound Filters - Using these operators, a hierarchy of filters can be created. For example:
+(Filter1 AND Filter2)OR(Filter3 AND Filter4)
+Comparison Operators
+
+LESS (<)
+LESS_OR_EQUAL (<=)
+EQUAL (=)
+NOT_EQUAL (!=)
+GREATER_OR_EQUAL (>=)
+GREATER (>)
+NO_OP (no operation)
+Comparators
+BinaryComparator - lexicographically compares against the specified byte array using the Bytes.compareTo(byte[], byte[]) method.
+BinaryPrefixComparator - lexicographically compares against a specified byte array. It only compares up to the length of this byte array.
+RegexStringComparator - compares against the specified byte array using the given regular expression. Only EQUAL and NOT_EQUAL comparisons are valid with this comparator.
+SubStringComparator - tests whether or not the given substring appears in a specified byte array. The comparison is case insensitive. Only EQUAL and NOT_EQUAL comparisons are valid with this comparator.
+
+Example1: >, 'binary:abc' will match everything that is lexicographically greater than "abc"
+Example2: =, 'binaryprefix:abc' will match everything whose first 3 characters are lexicographically equal to "abc"
+Example3: !=, 'regexstring:ab*yz' will match everything that doesn't begin with "ab" and ends with "yz"
+Example4: =, 'substring:abc123' will match everything that begins with the substring "abc123"
+
+Compound Operators
+Within an expression, parentheses can be used to group clauses together, and parentheses have the highest order of precedence.
+SKIP and WHILE operators are next, and have the same precedence.
+The AND operator is next.
+The OR operator is next.
+A filter string of the form: “Filter1 AND Filter2 OR Filter3” will be evaluated as: “(Filter1 AND Filter2) OR Filter3”
+A filter string of the form: “Filter1 AND SKIP Filter2 OR Filter3” will be evaluated as: “(Filter1 AND (SKIP Filter2)) OR Filter3”
+
+Filter Types
+HBase includes several filter types, as well as the ability to group filters together and create your own custom filters.
+This example scans the 'users' table for rows where the contents of the cf:name column equals the string 'abc'.
+Filter Types
+HBase includes several filter types, as well as the ability to group filters together and create your own custom filters.
+
+KeyOnlyFilter - takes no arguments. Returns the key portion of each key-value pair.
+Syntax: KeyOnlyFilter ()
+
+FirstKeyOnlyFilter - takes no arguments. Returns the key portion of the first key-value pair.
+Syntax: FirstKeyOnlyFilter ()
+
+PrefixFilter - takes a single argument, a prefix of a row key. It returns only those key-values present in a row that start with the specified row prefix
+Syntax:  PrefixFilter (‘<row_prefix>’)
+Example: PrefixFilter (‘Row’)
+
+ColumnPrefixFilter - takes a single argument, a column prefix. It returns only those key-values present in a column that starts with the specified column prefix.
+Syntax:  ColumnPrefixFilter (‘<column_prefix>’)
+Example: ColumnPrefixFilter (‘Col’)
+
+MultipleColumnPrefixFilter - takes a list of column prefixes. It returns key-values that are present in a column that starts with any of the specified column prefixes.
+Syntax:  MultipleColumnPrefixFilter (‘<column_prefix>’, ‘<column_prefix>’, …, ‘<column_prefix>’)
+Example: MultipleColumnPrefixFilter (‘Col1’, ‘Col2’)
+
+ColumnCountGetFilter - takes one argument, a limit. It returns the first limit number of columns in the table.
+Syntax:  ColumnCountGetFilter (‘<limit>’)
+Example: ColumnCountGetFilter (4)
+
+PageFilter - takes one argument, a page size. It returns page size number of rows from the table.
+Syntax:  PageFilter (‘<page_size>’)
+Example: PageFilter (2)
+
+ColumnPaginationFilter - takes two arguments, a limit and offset. It returns limit number of columns after offset number of columns. It does this for all the rows.
+Syntax:  ColumnPaginationFilter (‘<limit>’, ‘<offset>’)
+Example: ColumnPaginationFilter (3, 5)
+
+InclusiveStopFilter - takes one argument, a row key on which to stop scanning. It returns all key-values present in rows up to and including the specified row.
+Syntax:  InclusiveStopFilter (‘<stop_row_key>’)
+Example: InclusiveStopFilter (‘Row2’)
+
+TimeStampsFilter - takes a list of timestamps. It returns those key-values whose timestamps matches any of the specified timestamps.
+Syntax:  TimeStampsFilter (<timestamp>, <timestamp>, ... ,<timestamp>)
+Example: TimeStampsFilter (5985489, 48895495, 58489845945)
+
+RowFilter - takes a compare operator and a comparator. It compares each row key with the comparator using the compare operator and if the comparison returns true, it returns all the key-values in that row.
+Syntax:  RowFilter (<compareOp>, ‘<row_comparator>’)
+Example: RowFilter (<=, ‘binary:xyz)
+
+FamilyFilter - takes a compare operator and a comparator. It compares each family name with the comparator using the compare operator and if the comparison returns true, it returns all the key-values in that family.
+Syntax:  FamilyFilter (<compareOp>, ‘<family_comparator>’)
+Example: FamilyFilter (>=, ‘binaryprefix:FamilyB’)
+
+QualifierFilter - takes a compare operator and a comparator. It compares each qualifier name with the comparator using the compare operator and if the comparison returns true, it returns all the key-values in that column.
+Syntax:  QualifierFilter (<compareOp>, ‘<qualifier_comparator>’)
+Example: QualifierFilter (=, ‘substring:Column1’)
+
+ValueFilter - takes a compare operator and a comparator. It compares each value with the comparator using the compare operator and if the comparison returns true, it returns that key-value.
+Syntax:  ValueFilter (<compareOp>, ‘<value_comparator>’)
+Example: ValueFilter (!=, ‘binary:Value’)
+
+DependentColumnFilter - takes two arguments required arguments, a family and a qualifier. It tries to locate this column in each row and returns all key-values in that row that have the same timestamp. If the row does not contain the specified column, none of the key-values in that row will be returned.
+The filter can also take an optional boolean argument, dropDependentColumn. If set to true, the column used for the filter does not get returned.
+The filter can also take two more additional optional arguments, a compare operator and a value comparator, which are further checks in addition to the family and qualifier. If the dependent column is found, its value should also pass the value check. If it does pass the value check, only then is its timestamp taken into consideration.
+Syntax:  DependentColumnFilter (‘<family>’, ‘<qualifier>’, <boolean>, <compare operator>, ‘<value comparator’)
+         DependentColumnFilter (‘<family>’, ‘<qualifier>’, <boolean>)
+         DependentColumnFilter (‘<family>’, ‘<qualifier>’)
+
+Example: DependentColumnFilter (‘conf’, ‘blacklist’, false, >=, ‘zebra’)
+         DependentColumnFilter (‘conf’, ‘blacklist’, true)
+         DependentColumnFilter (‘conf’, ‘blacklist’)
+
+SingleColumnValueFilter - takes a column family, a qualifier, a compare operator and a comparator. If the specified column is not found, all the columns of that row will be emitted. If the column is found and the comparison with the comparator returns true, all the columns of the row will be emitted. If the condition fails, the row will not be emitted.
+This filter also takes two additional optional boolean arguments, filterIfColumnMissing and setLatestVersionOnly.
+If the filterIfColumnMissing flag is set to true, the columns of the row will not be emitted if the specified column to check is not found in the row. The default value is false.
+If the setLatestVersionOnly flag is set to false, it will test previous versions (timestamps) in addition to the most recent. The default value is true.
+These flags are optional and dependent on each other. You must set neither or both of them together.
+Syntax:  SingleColumnValueFilter (‘<family>’, ‘<qualifier>’, <compare operator>, ‘<comparator>’, <filterIfColumnMissing_boolean>, <latest_version_boolean>)
+Syntax:  SingleColumnValueFilter (‘<family>’, ‘<qualifier>’, <compare operator>, ‘<comparator>’)
+
+Example: SingleColumnValueFilter (‘FamilyA’, ‘Column1’, <=, ‘abc’, true, false)
+Example: SingleColumnValueFilter ('FamilyA’, ‘Column1’, <=, ‘abc’)
+
+SingleColumnValueExcludeFilter - takes the same arguments and behaves same as SingleColumnValueFilter. However, if the column is found and the condition passes, all the columns of the row will be emitted except for the tested column value.
+Syntax:  SingleColumnValueExcludeFilter (<family>, <qualifier>, <compare operators>, <comparator>, <latest_version_boolean>, <filterIfColumnMissing_boolean>)
+Syntax:  SingleColumnValueExcludeFilter (<family>, <qualifier>, <compare operator> <comparator>)
+
+Example: SingleColumnValueExcludeFilter (‘FamilyA’, ‘Column1’, ‘<=’, ‘abc’, ‘false’, ‘true’)
+Example: SingleColumnValueExcludeFilter (‘FamilyA’, ‘Column1’, ‘<=’, ‘abc’)
+
+ColumnRangeFilter - takes either minColumn, maxColumn, or both. Returns only those keys with columns that are between minColumn and maxColumn. It also takes two boolean variables to indicate whether to include the minColumn and maxColumn or not. If you don’t want to set the minColumn or the maxColumn, you can pass in an empty argument.
+Syntax:  ColumnRangeFilter (‘<minColumn >’, <minColumnInclusive_bool>, ‘<maxColumn>’, <maxColumnInclusive_bool>)
+Example: ColumnRangeFilter (‘abc’, true, ‘xyz’, false)
+
+Custom Filter - You can create a custom filter by implementing the Filter class. The JAR must be available on all RegionServers.
+
+hbase> scan 'users', { FILTER => SingleColumnValueFilter.new(Bytes.toBytes('cf'),
+      Bytes.toBytes('name'), CompareFilter::CompareOp.valueOf('EQUAL'),
+      BinaryComparator.new(Bytes.toBytes('abc')))}
+
+=======================================
+8. HBase doesn't provide any aggregation commands.
+================================================
+9. What is the use of disable operation in hbase?
+HBase is a strictly consistent NoSQL database in case of reads and writes.
+
+So achieving consistency is very important for HBase during DB operations.
+
+HBase demands disabling table in case of altering schema changes and dropping tables.
+
+HBase doesn't have a protocol to tell all the regions to update the schema changes online. So we need to disable the table before alter it.
+
+HBase table drop is two step procedure:
+
+Closing all the regions. i.e disable the table
+Dropping them. i.e drop the table.
+So We must disable all operations except a few operations like list, is_enabled, is_disabled etc... on the table before dropping it.
+
+==============================
+10. 
