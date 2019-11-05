@@ -18,6 +18,9 @@ set hive.execution.engine=tez;
 To use LLAP as the execution engine you can use the below command:
 
 set hive.execution.engine=llap;
+=======================================
+vectorized configuration.
+set hive.vectorized.execution.enabled=true/false;
 ===============================================================
 2. Dynamic Partitioning in Hive
 
