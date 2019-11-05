@@ -4,6 +4,14 @@ set hive.exec.dynamic.partition.mode=nonstrict;
 set hive.exec.max.dynamic.partitions=3000;
 set hive.exec.max.dynamic.partitions.pernode=3000;
 set hive.enforce.bucketing=true ;
+==============================================
+To find out the current execution engine of your Hive setup you can run the below command:
+set hive.execution.engine;
+If your current execution engine is something else then Tez, you can use the below command to set the execution engine as Tez(Tez is case insensitive).
+set hive.execution.engine=tez;
+To use LLAP as the execution engine you can use the below command:
+
+set hive.execution.engine=llap;
 ===============================================================
 2. Dynamic Partitioning in Hive
 Dynamic Partitioning in Hive
@@ -45,8 +53,4 @@ PARTITION(country='usa', state='nw',);
 h. If you need to change the file to be referred by a partition you can use the below query
 ALTER TABLE customer_partitioned PARTITION (country='usa',state='az')
 SET LOCATION 'newpath';
-==============================================
-To find out the current execution engine of your Hive setup you can run the below command:
-set hive.execution.engine;
-If your current execution engine is something else then Tez, you can use the below command to set the execution engine as Tez(Tez is case insensitive).
-set hive.execution.engine=tez;
+
