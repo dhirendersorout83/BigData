@@ -5,7 +5,12 @@ set hive.exec.max.dynamic.partitions=3000;
 set hive.exec.max.dynamic.partitions.pernode=3000;
 set hive.enforce.bucketing=true ;
 ==============================================
-set hive.llap.execution.mode=none/all;
+You can configure Hive LLAP using "hive.llap.execution.mode" which is by default set to none. In this case, Hive will not use LLAP. Other configurations are as follows:
+hive.llap.execution.mode=all; In this case, Hive will run all the queries using LLAP if possible and if LLAP is unable to run a particular query, it will be processed by Tez
+hive.llap.execution.mode=only; In this case, Hive will run all the queries using LLAP but if LLAP is unable to run a query, it will not fall back to Tez and will fail
+hive.llap.execution.mode=auto; In this case, Hive will decide whether to use LLAP or Tez for a particular query
+hive.llap.execution.mode=none; In this case, Hive won't use LLAP at all. Hence, all queries are processed using Tez containers.
+
 To find out the current execution engine of your Hive setup you can run the below command:
 set hive.execution.engine;
 If your current execution engine is something else then Tez, you can use the below command to set the execution engine as Tez(Tez is case insensitive).
