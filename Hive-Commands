@@ -45,4 +45,8 @@ PARTITION(country='usa', state='nw',);
 h. If you need to change the file to be referred by a partition you can use the below query
 ALTER TABLE customer_partitioned PARTITION (country='usa',state='az')
 SET LOCATION 'newpath';
-
+==============================================
+To find out the current execution engine of your Hive setup you can run the below command:
+set hive.execution.engine;
+If your current execution engine is something else then Tez, you can use the below command to set the execution engine as Tez(Tez is case insensitive).
+set hive.execution.engine=tez;
