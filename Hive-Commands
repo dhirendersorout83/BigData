@@ -21,6 +21,10 @@ set hive.execution.engine=llap;
 =======================================
 vectorized configuration.
 set hive.vectorized.execution.enabled=true/false;
+=============================================
+The log files are stored in a different sub-directory in the logs directory in HDFS each time the Spark program runs. To consider data stored in the sub-directories while creating HIVE tables, you need to set the following properties to TRUE.
+set hive.mapred.supports.subdirectories=TRUE;
+set mapred.input.dir.recursive=TRUE;
 ===============================================================
 2. Dynamic Partitioning in Hive
 
@@ -51,6 +55,24 @@ WITH SERDEPROPERTIES (
 )  
 location 'hdfs://34.236.145.193:8080/user/admin/data_2004-08.csv'
 
+or
+
+CREATE EXTERNAL TABLE IF NOT EXISTS OrderDelivery(
+OrderID VARCHAR(6),
+CustomerID VARCHAR(7),
+Details  MAP<VARCHAR(5), INT>,
+CustomerName  STRING,
+HouseNo INT,
+Street STRING,
+City STRING,
+State STRING,
+PostalCode VARCHAR(8))
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+COLLECTION ITEMS TERMINATED BY '#'
+MAP KEYS TERMINATED BY '|'
+LINES TERMINATED BY '\n'
+STORED AS TEXTFILE;
 
 b. To load data into the table use the below command
 
@@ -101,4 +123,12 @@ h. If you need to change the file to be referred by a partition you can use the 
 
 ALTER TABLE customer_partitioned PARTITION (country='usa',state='az')
 SET LOCATION 'newpath';
+ALTER TABLE OrderDelivery SET LOCATION ‘/test/PizzaOrders/’;
 
+========================================================
+3. Lateral view example for using complex in select statement with other columns
+SELECT p.id,p.productname,colors.colorselection FROM default.products P
+LATERAL VIEW EXPLODE(p.productcoloroptions) colors as colorselection;
+===================================================
+4. hive built-in
+https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
