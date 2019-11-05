@@ -5,6 +5,7 @@ set hive.exec.max.dynamic.partitions=3000;
 set hive.exec.max.dynamic.partitions.pernode=3000;
 set hive.enforce.bucketing=true ;
 ==============================================
+set hive.llap.execution.mode=none/all;
 To find out the current execution engine of your Hive setup you can run the below command:
 set hive.execution.engine;
 If your current execution engine is something else then Tez, you can use the below command to set the execution engine as Tez(Tez is case insensitive).
