@@ -20,43 +20,82 @@ To use LLAP as the execution engine you can use the below command:
 set hive.execution.engine=llap;
 ===============================================================
 2. Dynamic Partitioning in Hive
+
 Dynamic Partitioning in Hive
+
 You need to download the “customer.dat” given below the video.
 Note: You should download the file to your local system if you are using Quickstart VM. If you
 are using Hue, you can upload the file to HDFS as shown in the video in previous session.
+
 a. To create table use the below query
+
 CREATE TABLE customer(customer_fname VARCHAR(64),customer_lname
 VARCHAR(64),customer_addr STRING,city VARCHAR(64),state
 VARCHAR(64),country VARCHAR(64)) ROW FORMAT DELIMITED FIELDS
 TERMINATED BY ‘,’ STORED AS TEXTFILE;
+
+create external table if not exists airline_data ( year string ,
+month int , dayofmonth int , dayofweek int , depart bigint , scheduledepart bigint , 
+arrival bigint , schedulearrival bigint , carrierid string , flightno int , tailno string ,
+actualelapsed bigint , crselapsed bigint , airtime bigint , arrdealy int , depdealy int,
+origin string , destination string , distance int , taxitime int , cancel tinyint , 
+cancelcode string, diverted tinyint , carrierdelay int , weatherdelay int , nasdelay int,
+securitydealy int , lateaircraft int ) ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES (
+   "separatorChar" = "\t",
+   "quoteChar"     = "'",
+   "escapeChar"    = "\\"
+)  
+location 'hdfs://34.236.145.193:8080/user/admin/data_2004-08.csv'
+
+
 b. To load data into the table use the below command
+
 LOAD DATA INPATH 'yourdatapath' INTO TABLE customer ;
+
 Note: If you are using the VM and data is on your local machine use the below command
+
 LOAD DATA LOCAL INPATH 'yourdatapath' INTO TABLE customer ;
+
 Also, note that you will need to provide path to the data file of the particular country and state
 which you mention in the last line. Similarly you can load data for other countries also.
+
 c. By default, dynamic partitioning is disabled in Hive to prevent accidental partition
+
 creation. To enable, we use:
+
 set hive.exec.dynamic.partition =true;
 set hive.exec.dynamic.partition.mode=nonstrict;
+
 d. Create a partitioned table using the below query
+
 CREATE TABLE partitioned_customer(customer_fname
 varchar(64),customer_lname varchar(64),customer_addr string,city
 varchar(64))PARTITIONED BY (country VARCHAR(64),state VARCHAR(64));
+
 e. Load data into the partitioned table using the previously created normal table
+
 Insert into table partitioned_customer partition(country,state)
 select
 customer_fname,customer_lname,customer_addr,city,country,state from
 customer;
+
 f. To show all the partitions
+
 show partitions partitioned_customer;
+
 7. Simple select query using partition
+
 Select * from partitioned_customer where state='az' and country='usa'
 ;
+
 g. If you want to drop any partitions, it can be done as:
+
 ALTER Table partitioned_customer DROP IF EXISTS
 PARTITION(country='usa', state='nw',);
+
 h. If you need to change the file to be referred by a partition you can use the below query
+
 ALTER TABLE customer_partitioned PARTITION (country='usa',state='az')
 SET LOCATION 'newpath';
 
