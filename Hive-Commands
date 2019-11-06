@@ -35,7 +35,7 @@ Note: You should download the file to your local system if you are using Quickst
 are using Hue, you can upload the file to HDFS as shown in the video in previous session.
 
 a. To create table use the below query
-
+-----------------------------------------------
 CREATE TABLE customer(customer_fname VARCHAR(64),customer_lname
 VARCHAR(64),customer_addr STRING,city VARCHAR(64),state
 VARCHAR(64),country VARCHAR(64)) ROW FORMAT DELIMITED FIELDS
@@ -72,10 +72,11 @@ FIELDS TERMINATED BY ','
 COLLECTION ITEMS TERMINATED BY '#'
 MAP KEYS TERMINATED BY '|'
 LINES TERMINATED BY '\n'
-STORED AS TEXTFILE;
+STORED AS TEXTFILE
+tblproperties ("skip.header.line.count"="1");
 
 b. To load data into the table use the below command
-
+-----------------------------------------------------
 LOAD DATA INPATH 'yourdatapath' INTO TABLE customer ;
 
 Note: If you are using the VM and data is on your local machine use the below command
@@ -86,41 +87,41 @@ Also, note that you will need to provide path to the data file of the particular
 which you mention in the last line. Similarly you can load data for other countries also.
 
 c. By default, dynamic partitioning is disabled in Hive to prevent accidental partition
-
+-----------------------------------------------------
 creation. To enable, we use:
 
 set hive.exec.dynamic.partition =true;
 set hive.exec.dynamic.partition.mode=nonstrict;
 
 d. Create a partitioned table using the below query
-
+-----------------------------------------------------
 CREATE TABLE partitioned_customer(customer_fname
 varchar(64),customer_lname varchar(64),customer_addr string,city
 varchar(64))PARTITIONED BY (country VARCHAR(64),state VARCHAR(64));
 
 e. Load data into the partitioned table using the previously created normal table
-
+-----------------------------------------------------
 Insert into table partitioned_customer partition(country,state)
 select
 customer_fname,customer_lname,customer_addr,city,country,state from
 customer;
 
 f. To show all the partitions
-
+-----------------------------------------------------
 show partitions partitioned_customer;
 
-7. Simple select query using partition
-
+g. Simple select query using partition
+-----------------------------------------------------
 Select * from partitioned_customer where state='az' and country='usa'
 ;
 
-g. If you want to drop any partitions, it can be done as:
-
+h. If you want to drop any partitions, it can be done as:
+-----------------------------------------------------
 ALTER Table partitioned_customer DROP IF EXISTS
 PARTITION(country='usa', state='nw',);
 
-h. If you need to change the file to be referred by a partition you can use the below query
-
+i. If you need to change the file to be referred by a partition you can use the below query
+-----------------------------------------------------
 ALTER TABLE customer_partitioned PARTITION (country='usa',state='az')
 SET LOCATION 'newpath';
 ALTER TABLE OrderDelivery SET LOCATION ‘/test/PizzaOrders/’;
@@ -154,5 +155,15 @@ SELECT * FROM bdp.infostore;
 
 CREATE TABLE avro_test ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe' STORED AS AVRO TBLPROPERTIES ('avro.schema.url'='myHost/myAvroSchema.avsc'); 
 CREATE EXTERNAL TABLE parquet_test LIKE avro_test STORED AS PARQUET LOCATION 'hdfs://myParquetFilesPath';
+
+
+
+
+======================================================================
+Try at home
+1. insert NA to int type cloumn
+2. try to create parquet file from avro file
+3. Add jar /opt/cloudera/parcels/CDH/lib/hive-hcatalog/share/hcatalog/hive-hcatalog-core-1.1.0-cdh5.15.0.jar;
+4. scp -i locationofpemfile locationofdownloadeddataset
 
 
