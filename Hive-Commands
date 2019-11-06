@@ -161,7 +161,7 @@ CREATE EXTERNAL TABLE parquet_test LIKE avro_test STORED AS PARQUET LOCATION 'hd
 
 ======================================================================
 Try at home
-1. insert NA to int type cloumn
+1. insert NA to int type cloumn. clean up hive data before inserting.
 2. try to create parquet file from avro file
 3. Add jar /opt/cloudera/parcels/CDH/lib/hive-hcatalog/share/hcatalog/hive-hcatalog-core-1.1.0-cdh5.15.0.jar;
 4. scp -i locationofpemfile locationofdownloadeddataset
