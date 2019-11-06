@@ -149,3 +149,10 @@ ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ':'
 SELECT * FROM bdp.infostore;
 
+======================================================================
+6. Create Hive table to read parquet files from parquet/avro schema
+
+CREATE TABLE avro_test ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe' STORED AS AVRO TBLPROPERTIES ('avro.schema.url'='myHost/myAvroSchema.avsc'); 
+CREATE EXTERNAL TABLE parquet_test LIKE avro_test STORED AS PARQUET LOCATION 'hdfs://myParquetFilesPath';
+
+
