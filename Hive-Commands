@@ -132,3 +132,20 @@ LATERAL VIEW EXPLODE(p.productcoloroptions) colors as colorselection;
 ===================================================
 4. hive built-in
 https://cwiki.apache.org/confluence/display/Hive/LanguageManual+UDF
+
+
+=========================================================
+5. write hive query output to directory
+Explanation of the query:
+Insert overwrite is written so that if the file is already loaded then it will update the file in the second time run.
+You have to define a local directory which was created in the first step. The output file will be available under the created directory.
+Look at the line where fields terminated is written, there we have mentioned colon (: ) as we want columns to be separated by a colon delimiter. You can change it to comma (‘,’) or pipe (‘|’) as per your requirement.
+We are taking all the data of infostore table so ‘*’ is mentioned in the select query. You can also add filter condition if you wish to transfer certain records.
+Please refer below screenshot for reference.
+
+mkdir /root/local_bdp/posts/export-hive-data-into-file/output
+INSERT OVERWRITE LOCAL DIRECTORY '/root/local_bdp/posts/export-hive-data-into-file/output'
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ':'
+SELECT * FROM bdp.infostore;
+
