@@ -1,0 +1,2 @@
+1. create some lasrge tables in mysql to create use for sqoop job.
+2. create sqoop job which fecthed data form mysql and inserts into hive table/hbase table.
