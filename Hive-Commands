@@ -172,7 +172,13 @@ Try at home
     org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat'
     TBLPROPERTIES ('avro.schema.url'='hdfs/path/to/avro_schema_file.avsc',
     "skip.header.line.count"="1"); 
-
+   or
+   CREATE TABLE avro_test ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe' 
+   STORED AS AVRO TBLPROPERTIES ('avro.schema.url'='myHost/myAvroSchema.avsc'); 
+   
+   CREATE EXTERNAL TABLE parquet_test LIKE avro_test STORED AS PARQUET LOCATION 'hdfs://myParquetFilesPath';
+   or
+   
 3. Add jar /opt/cloudera/parcels/CDH/lib/hive-hcatalog/share/hcatalog/hive-hcatalog-core-1.1.0-cdh5.15.0.jar;
 4. scp -i locationofpemfile locationofdownloadeddataset (secure copy command)
 
