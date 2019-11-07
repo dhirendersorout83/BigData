@@ -181,5 +181,22 @@ Try at home
    
 3. Add jar /opt/cloudera/parcels/CDH/lib/hive-hcatalog/share/hcatalog/hive-hcatalog-core-1.1.0-cdh5.15.0.jar;
 4. scp -i locationofpemfile locationofdownloadeddataset (secure copy command)
+5. static pertitioning:
+data:
+jack,jones,41th st,phoenix
+jack,jones,49th st,scottsdale
 
+or
+
+jack,jones,41th st,phoenix,az,usa
+jack,jones,49th st,scottsdale,az,usa
+
+CREATE TABLE partitioned_customer(customer_fname
+varchar(64),customer_lname varchar(64),customer_addr string,city
+varchar(64))PARTITIONED BY (country VARCHAR(64),state VARCHAR(64));
+
+
+load data local inpath '/home/ec2-user/HiveUDF/az.txt' into table customer_partitioned partition(state = 'az',country ='usa')
+or
+load data local inpath '/home/ec2-user/HiveUDF/az.txt' into table customer_partitioned partition(country ='usa',state = 'az')
 
