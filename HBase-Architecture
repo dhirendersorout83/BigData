@@ -1,0 +1,25 @@
+Region Server
+
+Region server manages regions. There are multiple Region Servers in a cluster. 
+Each Region server contains- 
+ WAL which is a Write Ahead Log, also known as HLog. WAL stores new or updated data that has not been written to permanent storage(as HFiles in HDFS) and can be used for recovery in case of region server failure. The region server stores the WAL file in HDFS.
+Block Cache which is a read cache, stores frequently read data from HDFS.
+Region: Is assigned a region of the table. Each Region contains a Store per column family. The Store consists of a Memstore, hence there is one MemStore per column family.
+A client talks directly with the Region Server to perform read or write operations. This Region Server assigns the request to the specific Region where the data resides.
+ 
+
+HMaster
+
+Acts as the master server, and manages multiple Region Servers.
+An HBase cluster may have one or more master nodes, but only one HMaster is active at a given time. This active node is responsible for:
+Performing the admin functionalities: HMaster performs DDL operations such as Creating or deleting a table.
+Coordinating with Region server: HMaster assigns regions to various region servers on startup and reassigns region in case of load balancing or recovery. 
+Load Balancing: Whenever there is a high load on any region server, HMaster unloads the busy server and re-assigns this load to less occupied servers.
+Recovery: HMaster also handles Region Server failures by reassigning the regions or load of the failed region server to another non-failing Region Server.
+ 
+Zookeeper
+
+ A distributed open-source coordinating service for distributed applications.
+Maintains configuration information, naming, provides distributed synchronisation, group services etc.
+HBase uses Zookeeper to maintain the live server state in the cluster by receiving heartbeat messages from all HMasters (Active/Inactive) and Region Servers. 
+Stores the location of META table.
