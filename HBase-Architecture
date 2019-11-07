@@ -23,3 +23,59 @@ Zookeeper
 Maintains configuration information, naming, provides distributed synchronisation, group services etc.
 HBase uses Zookeeper to maintain the live server state in the cluster by receiving heartbeat messages from all HMasters (Active/Inactive) and Region Servers. 
 Stores the location of META table.
+
+====================================================
+HBase Read/Write Operation (common steps):
+
+     Step 1: Client contacts the zookeeper, to fetch the location, of the META table (if the client doesn't have the latest version of the META table already cached).
+     Step 2: Client queries the META table, to find the location, of the region server, that has the region containing the row-key which the client is looking for. 
+     Step 3: The Client caches, the identified region server information, as well as, the META table location, for future interactions.  
+      Step 4: The client can now communicate with the specific region server, identified in the previous Step 2. This Region Server, assigns the request, to the specific region, where the Read or Write, operations can be executed.
+      
+      HBase Write Operation: 
+
+     Step 1: The data first needed to be written to the WAL, which is a Write Ahead Log. WAL stores the new or updated data which has not been written to the HDFS and can be used for recovery, in case of region server failure.
+     Step 2: Once the data is written to the WAL, it is placed in the MemStore of a region and the key-value pairs. When the MemStore becomes full, its contents are flushed to HDFS(DataNode) to form a new HFile.
+     Step 3: Finally, an acknowledgement is sent back to the client.
+     
+     HBase Read Operation:
+
+     Step 1: The region server first checks the block cache of the region server that stores the recently accessed data. 
+     Step 2: In case the data is not available in the Block cache, it checks the required data in the in-memory store i.e. MemStore. 
+     Step 3: If the MemStore doesn’t contain that particular key-value, Region server uses Bloom Filters to find the HFile(StoreFile) which contains that particular key-value pair. Each HFile has a Bloom filter that is loaded into memory to check if the HFile contains the required key-value. Once the HFile is identified, Instead of reading entire HFile(~GB size) the Data Block Index of the HFile is scanned to get the Data Block which has the key-value pair, A Binary Search in this Data Block finally returns the key-value pair(or null in case it doesn't exist).
+     
+     ==================================================
+     Compactions
+
+Flushes from MemStore, to the HDFS, create multiple HFiles, especially during periods of heavy incoming writes. which leads to two major problems- 
+
+The read efficiency gets low, This is because a large number of HFiles will increase the number of disks seeks, needed for a read process. Thus, adversely impacting the read performance. 
+It leads to Dirty data, A large number of HFiles might result in a lot of redundancy, and inconsistency in data. 
+Compaction comes to our rescue, against these challenges, Compaction refers, to a process of combining small HFiles, to a large HFiles containing merged, sorted and most recent information.
+
+Compactions are of two types Minor and Major, In Minor Compaction, HBase picks only some of the smaller HFiles and rewrites them into a few larger HFiles. Whereas in Major Compaction, all HFiles of a store are picked and rewritten into a single large HFile.
+The key difference between the two is, during Major compaction the values with tombstone markers (deleted data) and expired values(whose TTL is over) are removed from the HFiles.
+Major compaction is more resource intensive then Minor compaction, hence generally admins prefer minor compaction more frequent than major compactions.
+
+HBase Data Deletion
+Delete is a special type UpDate in HBase, where the values for which the delete request is submitted are not deleted immediately. Rather these values are masked by assigning a tombstone marker to them. Every request to read these values(with tombstone markers) returns null to the client, which gives the client the impression that the values are already deleted(Consistency).
+
+
+The reason, why HBase does this, is because HFiles are immutable(Recall: HDFS doesn't allow modifying data of a file). All the values with tombstone marker are permanently removed during the next Major Compaction.
+
+ 
+
+There are three types of tombstone markers:
+
+Version Delete Marker: which is used to mark a single version of a column value 
+Column Delete Marker: Marks all versions of a column
+Family Delete Marker: Marks all versions of all columns for a column family
+
+===========================================================
+In the case of server failure-
+
+If the Active HMaster fails then the Zookeeper gives the master's reportability to one of the In-Active HMasters in the cluster.
+If a Region Server fails Zookeeper notifies the HMaster about it.
+ HMaster re-assigns the regions of failed region server to some other region server.
+It is done by splitting the WAL file belonging to the failed region server and re-assigning it to non-failing servers.
+Each region server then replays the WAL and restores the lost MemStore data.
