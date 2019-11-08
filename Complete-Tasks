@@ -1,2 +1,15 @@
 1. create some lasrge tables in mysql to create use for sqoop job.
+> login in mysql: mysql -uroot -pcloudera
+> create table airline_data ( year int ,
+month int , dayofmonth int , dayofweek int , depart bigint , scheduledepart bigint , 
+arrival bigint , schedulearrival bigint , carrierid varchar(20) , flightno int , tailno varchar(20) ,
+actualelapsed bigint , crselapsed bigint , airtime bigint , arrdealy int , depdealy int,
+origin varchar(20) , destination varchar(20) , distance int , taxitime int , cancel tinyint , 
+cancelcode varchar(20), diverted tinyint , carrierdelay int , weatherdelay int , nasdelay int,
+securitydealy int , lateaircraft int )
+
+3. hive table:
+
 2. create sqoop job which fecthed data form mysql and inserts into hive table/hbase table.
+
+sqoop job --create sqoop -- export --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --password cloudera --table airline_data --export-dir /user/hive/warehouse/flights_data/* --input-fields-terminated-by ',' --input-lines-terminated-by '\n'
