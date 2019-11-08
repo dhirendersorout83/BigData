@@ -3,6 +3,16 @@ sudo mkdir /var/lib/accumulo
 ACCUMULO_HOME=/var/lib/accumulo
 export ACCUMULO_HOME
 
+Table 6. Input parsing arguments:
+
+Argument	Description
+--input-enclosed-by <char>	Sets a required field encloser
+--input-escaped-by <char>	Sets the input escape character
+--input-fields-terminated-by <char>	Sets the input field separator
+--input-lines-terminated-by <char>	Sets the input end-of-line character
+--input-optionally-enclosed-by <char>	Sets a field enclosing character
+
+
 1. sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --password cloudera --table Categories --target-dir /input/data/tables
  note: every time have to change target directory. to overcome this, we can use -warehouse-dir. this way at same path we can import multiple tables at same path.
 
