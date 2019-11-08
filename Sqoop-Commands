@@ -1,1 +1,72 @@
-1.
+to resolve accumulo error
+sudo mkdir /var/lib/accumulo
+ACCUMULO_HOME=/var/lib/accumulo
+export ACCUMULO_HOME
+
+1. sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --password cloudera --table Categories --target-dir /input/data/tables
+ note: every time have to change target directory. to overcome this, we can use -warehouse-dir. this way at same path we can import multiple tables at same path.
+
+to import multiple tables, use -warehouse-dir
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --password cloudera --table Categories --warehouse-dir /input/data/tables
+
+
+2. to enter the password on command line use -P option instead of -password ******** 
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --P --table Categories --target-dir /input/data/tables
+
+3. to import all tables and excluding few table
+sqoop import-all-tables --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --P  --target-dir /input/data/alltables
+
+sqoop import-all-tables --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --P --exclude-tables Categories,Products --target-dir /input/data/alltables
+
+4. Import Specific Rows Using Sqoop use --where option
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --password cloudera --table Categories --where "Category = 'Grocery'" --target-dir /groceryproducts
+
+5. SQL Queries Within Sqoop Import
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --password cloudera 
+--query 'SELECT ItemCode, Item, ManufacturedBy, Stock, LastStockedOn FROM Stocks JOIN Manufacturers USING(MCode) WHERE $CONDITIONS' 
+--split-by Itemcode --target-dir /stocksinfo
+
+Also, ‘$CONDITIONS’ is a placeholder that would be substituted automatically by Sqoop to indicate which slice of data is to be transferred by each task. 
+This type of import command is also known as free-form query import. 
+Sqoop does not use the database catalogue to fetch the metadata while doing free-form query imports.
+
+--split-by clause is mandatory if primary key not defined or use -num-mappers 1
+-- can not use --warehouse-dir if using --query option
+
+6. Incremental Import Using Sqoop --split-by option is must as no primary key define in emp
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --password cloudera --spli-by id --table emp --warehouse-dir /input/data/tables
+insert rows
+sqoop import --connect jdbc:mysql://localhost:3306/sqoopdemo --username root --password 123 --table emp --incremental append --check-column AgentId --last-value 4 --target-dir morningshift
+ for incremental import character column can not be used for --split-by option
+
+7. export from hdfs to back rdbms
+sqoop export --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --password cloudera --table Consolidated_Stocks --export-dir /stocksinfo
+
+--export-dir is hdfs location where data stored in csv file generated after hadoop job
+
+8. sqoop jobs which can be schedule /execute 
+sqoop job --create morningshift -- import --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --password cloudera --table Morning_Shift --incremental append --check-column AgentId --last-value 4 --target-dir /morningshift
+
+sqoop job --exec morningshift
+
+To get a list of all your saved jobs, run this command:
+sqoop job --list
+
+To delete a job that is no longer needed, run this command:
+sqoop job --delete morningshift
+
+9. handling null value as sqoop support file formats that generally does not support null value. so it is require to handle null values by substitution
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/enron --username root --password cloudera --table employeelist --null-string 'NA' --null-non-string '\\N' --warehouse-dir /enron
+
+10. import in sequence file formats
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/enron --username root --password cloudera --table referenceinfo --as-sequencefile --warehouse-dir /enron
+avro:
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/enron --username root --password cloudera --table referenceinfo --as-avrodatafile --warehouse-dir /enron
+To see the output:
+hadoop fs -ls /enron/referenceinfo
+You can see that all the files created have .avro suffix.
+
+11. compression
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/enron --username root --password cloudera --table message --compress --warehouse-dir /enron
+
+
