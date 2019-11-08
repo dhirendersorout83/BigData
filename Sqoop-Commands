@@ -69,4 +69,6 @@ You can see that all the files created have .avro suffix.
 11. compression
 sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/enron --username root --password cloudera --table message --compress --warehouse-dir /enron
 
-
+==============================================
+export job to export hive data to mysql
+12. sqoop job --create sqoop -- export --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --password cloudera --table airline_data --export-dir /user/hive/warehouse/flights_data/* --input-fields-terminated-by ',' --input-lines-terminated-by '\n'
