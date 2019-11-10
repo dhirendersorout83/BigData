@@ -146,3 +146,280 @@ The above screen shot shows altered table name with scope attributes
 Method table_att_unset is used to unset attributes present in the table
 The second instance we are unsetting attribute MAX_FILESIZE
 After execution of the command, it will simply unset MAX_FILESIZE attribute from"education" table.
+
+alter_status
+==========================
+ Syntax: alter_status 'education'
+HBase Shell and General Commands
+
+Through this command, you can get the status of the alter command
+Which indicates the number of regions of the table that have received the updated schema pass table name
+Here in above screen shot it shows 1/1 regions updated. It means that it has updated one region. After that if it successful it will display comment done.
+
+
+===========================================================================
+
+
+Data manipulation commands
+These commands will work on the table related to data manipulations such as putting data into a table, retrieving data from a table and deleting schema, etc.
+
+The commands come under these are
+
+Count
+Put
+Get
+Delete
+Delete all
+Truncate
+Scan
+Let look into these commands usage with an example.
+
+Count
+===============
+Syntax: count <'tablename'>, CACHE =>1000
+The command will retrieve the count of a number of rows in a table. The value returned by this one is the number of rows.
+Current count is shown per every 1000 rows by default.
+Count interval may be optionally specified.
+Default cache size is 10 rows.
+Count command will work fast when it is configured with right Cache.
+
+Example:
+
+HBase Shell and General Commands
+
+hbase> count 'guru99', CACHE=>1000
+This example count fetches 1000 rows at a time from "Guru99" table.
+
+We can make cache to some lower value if the table consists of more rows.
+
+But by default it will fetch one row at a time.
+
+hbase>count 'guru99', INTERVAL => 100000
+hbase> count 'guru99', INTERVAL =>10, CACHE=> 1000
+If suppose if the table "Guru99" having some table reference like say g.
+
+We can run the count command on table reference also like below
+
+hbase>g.count INTERVAL=>100000
+hbase>g.count INTERVAL=>10, CACHE=>1000
+
+Put
+=============================
+Syntax:  put <'tablename'>,<'rowname'>,<'columnvalue'>,<'value'>
+This command is used for following things
+
+It will put a cell 'value' at defined or specified table or row or column.
+It will optionally coordinate time stamp.
+Example:
+
+Here we are placing values into table "guru99" under row r1 and column c1
+hbase> put 'guru99', 'r1', 'c1', 'value', 10
+We have placed three values, 10,15 and 30 in table "guru99" as shown in screenshot below
+HBase Shell and General Commands
+
+Suppose if the table "Guru99" having some table reference like say g. We can also run the command on table reference also like
+
+hbase> g.put 'guru99', 'r1', 'c1', 'value', 10
+The output will be as shown in the above screen shot after placing values into "guru99".
+
+To check whether the input value is correctly inserted into the table, we use "scan" command. In the below screen shot, we can see the values are inserted correctly
+
+HBase Shell and General Commands
+
+Code Snippet: For Practice
+
+create 'guru99', {NAME=>'Edu', VERSIONS=>213423443}
+put 'guru99', 'r1', 'Edu:c1', 'value', 10
+put 'guru99', 'r1', 'Edu:c1', 'value', 15
+put 'guru99', 'r1', 'Edu:c1', 'value', 30
+From the code snippet, we are doing these things
+
+Here we are creating a table named 'guru99' with the column name as "Edu."
+By using "put" command, we are placing values into row name r1 in column "Edu" into table "guru99."
+
+
+Get
+====================
+Syntax: get <'tablename'>, <'rowname'>, {< Additional parameters>}
+Here <Additional Parameters> include TIMERANGE, TIMESTAMP, VERSIONS and FILTERS.
+
+By using this command, you will get a row or cell contents present in the table. In addition to that you can also add additional parameters to it like TIMESTAMP, TIMERANGE,VERSIONS, FILTERS, etc. to get a particular row or cell content.
+
+HBase Shell and General Commands
+
+Examples:-
+
+hbase> get 'guru99', 'r1', {COLUMN => 'c1'}
+For table "guru99' row r1 and column c1 values will display using this command as shown in the above screen shot
+
+hbase> get 'guru99', 'r1'
+For table "guru99"row r1 values will be displayed using this command
+
+hbase> get 'guru99', 'r1', {TIMERANGE => [ts1, ts2]}
+For table "guru99"row 1 values in the time range ts1 and ts2 will be displayed using this command
+
+hbase> get 'guru99', 'r1', {COLUMN => ['c1', 'c2', 'c3']}
+For table "guru99" row r1 and column families' c1, c2, c3 values will be displayed using this command
+
+
+Delete
+=============
+Syntax:delete <'tablename'>,<'row name'>,<'column name'>
+This command will delete cell value at defined table of row or column.
+Delete must and should match the deleted cells coordinates exactly.
+When scanning, delete cell suppresses older versions of values.
+HBase Shell and General Commands
+
+Example:
+
+hbase(main):)020:0> delete 'guru99', 'r1', 'c1''. 
+The above execution will delete row r1 from column family c1 in table "guru99."
+Suppose if the table "guru99" having some table reference like say g.
+We can run the command on table reference also like hbase> g.delete 'guru99', 'r1', 'c1'".
+
+
+deleteall
+==============
+Syntax: deleteall <'tablename'>, <'rowname'>
+HBase Shell and General Commands
+
+This Command will delete all cells in a given row.
+We can define optionally column names and time stamp to the syntax.
+Example:-
+
+hbase>deleteall 'guru99', 'r1', 'c1'
+This will delete all the rows and columns present in the table. Optionally we can mention column names in that.
+
+Truncate
+========================
+Syntax:  truncate <tablename>
+HBase Shell and General Commands
+
+After truncate of an hbase table, the schema will present but not the records. This command performs 3 functions; those are listed below
+
+Disables table if it already presents
+Drops table if it already presents
+Recreates the mentioned table
+Scan
+Syntax: scan <'tablename'>, {Optional parameters}
+This command scans entire table and displays the table contents.
+
+We can pass several optional specifications to this scan command to get more information about the tables present in the system.
+Scanner specifications may include one or more of the following attributes.
+These are TIMERANGE, FILTER, TIMESTAMP, LIMIT, MAXLENGTH, COLUMNS, CACHE, STARTROW and STOPROW.
+scan 'guru99' 
+The output as below shown in screen shot
+
+HBase Shell and General Commands
+
+In the above screen shot
+
+It shows "guru99" table with column name and values
+It consists of three row values r1, r2, r3 for single column value c1
+It displays the values associated with rows
+Examples:-
+
+The different usages of scan command
+
+Command
+
+Usage
+
+scan '.META.', {COLUMNS => 'info:regioninfo'}
+
+It display all the meta data information related to columns that are present in the tables in HBase
+
+scan 'guru99', {COLUMNS => ['c1', 'c2'], LIMIT => 10, STARTROW => 'xyz'}
+
+It display contents of table guru99 with their column families c1 and c2 limiting the values to 10
+
+scan 'guru99', {COLUMNS => 'c1', TIMERANGE => [1303668804, 1303668904]}
+
+It display contents of guru99 with its column name c1 with the values present in between the mentioned time range attribute value
+
+scan 'guru99', {RAW => true, VERSIONS =>10}
+
+In this command RAW=> true provides advanced feature like to display all the cell values present in the table guru99
+
+Code Example:
+
+First create table and place values into table
+
+create 'guru99', {NAME=>'e', VERSIONS=>2147483647}
+put 'guru99', 'r1', 'e:c1', 'value', 10
+put 'guru99', 'r1', 'e:c1', 'value', 12
+put 'guru99', 'r1', 'e:c1', 'value', 14
+delete 'guru99', 'r1', 'e:c1', 11
+Input Screenshot:
+
+HBase Shell and General Commands
+
+If we run scan command
+
+Query: scan 'guru99', {RAW=>true, VERSIONS=>1000}
+It will display output shown in below.
+
+Output screen shot:
+
+HBase Shell and General Commands
+
+The output shown in above screen shot gives the following information
+
+Scanning guru99 table with attributes RAW=>true, VERSIONS=>1000
+Displaying rows with column families and values
+In the third row, the values displayed shows deleted value present in the column
+The output displayed by it is random; it cannot be same order as the values that we inserted in the table
+Cluster Replication Commands
+These commands work on cluster set up mode of HBase.
+For adding and removing peers to cluster and to start and stop replication these commands are used in general.
+Command
+
+Functionality
+
+add_peer
+
+Add peers to cluster to replicate
+
+hbase> add_peer '3', zk1,zk2,zk3:2182:/hbase-prod
+
+remove_peer
+
+Stops the defined replication stream.
+
+Deletes all the metadata information about the peer
+
+hbase> remove_peer '1'
+
+start_replication
+
+Restarts all the replication features
+
+hbase> start_replication
+
+stop_replication
+
+Stops all the replication features
+
+hbase>stop_replication
+
+Summary:
+
+HBase shell and general commands give complete information about different type of data manipulation, table management, and cluster replication commands. We can perform various functions using these commands on tables present in HBase.
+
+ 
+
+ PrevReport a BugNext 
+YOU MIGHT LIKE:
+ 
+
+HBase Tutorials
+1) Introduction to HBase
+2) Architecture,DataFlow,Use cases
+3) HBase Installation Guide
+4) Shell and General Commands
+5) Handling Tables in HBase
+6) Insert & Retrieve Data
+7) Limitation, Advantage, Problems
+8) Hbase Interview Questions
+
+
