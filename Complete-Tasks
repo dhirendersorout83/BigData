@@ -6,3 +6,11 @@ Task 1
 
 Task2
 ===================
+transfer data from hive table to hbase table.
+Step 1: Create Hive table
+Step 2: Load data into Hive
+Step 3: Create HBase-Hive Mapping table
+Step 4: Load data into HBase from Hive
+
+Task3
+=====================================
