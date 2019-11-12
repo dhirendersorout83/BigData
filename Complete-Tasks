@@ -15,3 +15,7 @@ Step 4: Load data into HBase from Hive
 Task3
 =====================================
 Read Data from Hbase and Load into hbase using spark Program.
+
+Task4
+====================================
+CRUD operation from spark/java in hbase
