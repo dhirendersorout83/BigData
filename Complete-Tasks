@@ -4,13 +4,14 @@ Task 1 - Done
 2. hive table flights_data with data.
 3. sqoop job to export to mysql from hive
 
-Task2
+Task2 - Done
 ===================
 transfer data from hive table to hbase table.
 Step 1: Create Hive table
 Step 2: Load data into Hive
 Step 3: Create HBase-Hive Mapping table
 Step 4: Load data into HBase from Hive
+step 5: create hbase table and do hbase-hive integration(vice versa of step 1)
 
 Task3
 =====================================
