@@ -1,0 +1,134 @@
+A tool which exports a set of files from HDFS back to RDBMS. That tool is what we call a Sqooop Export Tool. There is one condition for it, that in the database, target the table must already exist. However, the input files are read and parsed according to the user-specified delimiters into a set of records.
+In addition, the default operation is to transform these into a set of INSERT statements that inject the records into the database. In “update mode,” sqoop will generate UPDATE statements that replace existing records in the database, and in “call mode” sqoop will make a stored procedure call for each record.
+
+1. Sqoop Export Syntax
+===========================
+$ sqoop export (generic-args) (export-args)
+$ sqoop-export (generic-args) (export-args)
+However, the export arguments can be entered in any order with respect to one another, but the Hadoop generic arguments must precede any export arguments.
+Table 1. Common arguments
+
+Argument	Description
+========  ============
+–connect <jdbc-uri>	Specify JDBC connect string
+–connection-manager <class-name>	Specify connection manager class to use
+–driver <class-name>	Manually specify JDBC driver class to use
+–hadoop-mapred-home <dir>	Override $HADOOP_MAPRED_HOME
+–help	Print usage instructions
+–password-file	Set path for a file containing the authentication password
+-P	Read password from console
+–password <password>	Set authentication password
+–username <username>	Set authentication username
+–verbose	Print more information while working
+–connection-param-file <filename>	Optional properties file that provides connection parameters
+Table 2. Validation arguments More Details
+
+Argument	Description
+–validate	Enable validation of data copied, supports single table copy only.
+–validator <class-name>	Specify validator class to use.
+–validation-threshold <class-name>	Specify validation threshold class to use.
+–validation-failurehandler <class-name>	Specify validation failure handler class to use.
+
+2. Table 3. Export control arguments:
+====================================
+
+Argument	Description
+========  ==============
+–columns <col,col,col…>	Columns to export to table
+–direct	Use direct export fast path
+–export-dir <dir>	HDFS source path for the export
+-m,–num-mappers <n>	Use n map tasks to export in parallel
+–table <table-name>	Table to populate
+–call <stored-proc-name>	Stored Procedure to call
+–update-key <col-name>	Anchor column to use for updates. Use a comma separated list of columns if there are more than one column.
+–update-mode <mode>	Specify how updates are performed when new rows are found with non-matching keys in database.
+Legal values for mode include updateonly (default) and allowinsert.
+–input-null-string <null-string>	The string to be interpreted as null for string columns
+–input-null-non-string <null-string>	The string to be interpreted as null for non-string columns
+–staging-table <staging-table-name>	The table in which data will be staged before being inserted into the destination table.
+–clear-staging-table	Indicates that any data present in the staging table can be deleted.
+–batch	Use batch mode for underlying statement execution.
+
+Basically, we need both the –export-dir argument and one of –table or –call. Although, it specifies the table to populate in the database (or the stored procedure to call). Also, the directory in HDFS that contains the source data.
+In addition, all columns within a table are selected for export in Sqoop, by default. Moreover, by using the –columns argument we can select a subset of columns and control their ordering. Although, it should include a comma-delimited list of columns to export. Like: –columns “col1,col2,col3”.
+Note: Columns that are not included in the –columns parameter need to have either defined default value or allow NULL values.
+
+4. Difference between Inserts vs. Updates in Sqoop
+===================================================
+As we know, sqoop export appends new rows to a table. Here each input record is transformed into an INSERT statement that adds a row to the target database table. However, if our table already contains data and has constraints, we must take care to avoid inserting records. Since, that violate these constraints. Make sure that if an INSERT statement fails the export process will fail. However, for exporting records to a new this mode is primarily intended. Since, empty table intended to receive these results.
+In addition, Sqoop will modify an existing dataset in the database, if we specify the –update-key argument. Although, here each input record is considered as an UPDATE statement. Basically, that modifies an existing row. 
+CREATE TABLE foo(
+id INT NOT NULL PRIMARY KEY,
+msg VARCHAR(32),
+bar INT);
+In HDFS, consider also a dataset containing records like these:
+0,this is a test,42
+1,some more data,100
+…
+Also, Running sqoop-export –table foo –update-key id –export-dir /path/to/data –connect … will run an export job that executes SQL statements based on the data like so:
+UPDATE foo SET msg=’this is a test’, bar=42 WHERE id=0;
+UPDATE foo SET msg=’some more data’, bar=100 WHERE id=1;
+…
+We can also specify the –update-mode argument with allowinsert mode depending on the target database, if we want to update rows, if they exist in the database already or insert rows if they do not exist yet
+
+Table 4. Input parsing arguments:
+--------------------------------------------
+
+Argument	Description
+–input-enclosed-by <char>	Sets a required field encloser
+–input-escaped-by <char>	Sets the input escape character
+–input-fields-terminated-by <char>	Sets the input field separator
+–input-lines-terminated-by <char>	Sets the input end-of-line character
+–input-optionally-enclosed-by <char>	Sets a field enclosing character
+
+Table 5. Output line formatting arguments:
+--------------------------------------------
+Argument	Description
+–enclosed-by <char>	Sets a required field enclosing character
+–escaped-by <char>	Sets the escape character
+–fields-terminated-by <char>	Sets the field separator character
+–lines-terminated-by <char>	Sets the end-of-line character
+–mysql-delimiters	Uses MySQL’s default delimiter set: fields: , lines: \n escaped-by: \ optionally-enclosed-by:
+–optionally-enclosed-by <char>	Sets a field enclosing character
+Moreover, Sqoop will fail to find enough columns per line, if we specify incorrect delimiters. Basically, that will cause export map tasks to fail by throwing ParseExceptions.
+
+Table 6. Code generation arguments:
+------------------------------------------
+Argument	Description
+–bindir <dir>	Output directory for compiled objects
+–class-name <name>	Sets the generated class name. This overrides –package-name. When combined with –jar-file, sets the input class.
+–jar-file <file>	Disable code generation; use specified jar
+–outdir <dir>	Output directory for generated code
+–package-name <name>	Put auto-generated classes in this package
+–map-column-java <m>	Override default mapping from SQL type to Java type for configured columns.
+
+5. Exports and Transactions in Sqoop
+==================================
+However, by multiple writers in parallel Exports are performed. Basically, each writer uses a separate connection to the database. These have separate transactions from one another. Although, to insert up to 100 records per statement Sqoop uses the multi-row INSERT syntax. The current transaction within a writing task is committed, every 100 statements, that is causing a commit every 10,000 rows. That ensures that transaction buffers do not grow without bound. Also, cause out-of-memory conditions. Hence, a Sqoop export is not an atomic process. Note that, before the export is complete Partial results from the export will become visible.
+
+6. Failed Sqoop Export
+================================
+There are various reasons due to which export in sqoop may fail such as:
+
+Due to loss of connectivity from the Hadoop cluster to the database. Either due to a hardware fault, or server software crashes.
+By attempting to INSERT a row. That violates a consistency constraint. For example, inserting a duplicate primary key value.
+Also, attempting to parse an incomplete or malformed record from the HDFS source data
+Through attempting to parse records using incorrect delimiters
+Due to capacity issues. like insufficient RAM or disk space.
+
+7. Sqoop Exports Example
+================================
+To populate a table named bar, a basic export in Sqoop is:
+$ sqoop export –connect jdbc:mysql://db.example.com/foo –table bar  \
+–export-dir /results/bar_data
+Here, this example takes the files in /results/bar_data. Afterwards injects their contents into the bar table in the foo database on db.example.com. However, the first condition is that in the database the target table must already exist. Also, Sqoop performs a set of INSERT INTO operations, without regard for existing content.
+To populate a table named bar with validation enabled: More Details, another basic Sqoop export
+$ sqoop export –connect jdbc:mysql://db.example.com/foo –table bar  \
+–export-dir /results/bar_data –validate
+For every record in /results/bar_data  an export that calls a stored procedure named barproc would look like:
+$ sqoop export –connect jdbc:mysql://db.example.com/foo –call barproc \
+–export-dir /results/bar_data
+
+8. Conclusion – Sqoop Export Tutorial
+=====================================
+As a result, we have learned the whole concept of Sqoop Export, its purpose, syntax, Sqoop export updates vs insert, Exports and transactions in Sqoop, Failed Export in sqoop an example invocation. However, if you want to ask any Query, feel free to ask in the comment section.
