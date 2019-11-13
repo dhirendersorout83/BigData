@@ -1,5 +1,6 @@
 Load file to ec2-instance
 1. copy files to ec2-instance
+   scp -i locationofpemfile locationofdownloadeddataset ec2-user@yourpublicip:/home/ec2-user
 2. Create directories to import data from mysql. from there further we will move the data to hive/hbase
 3.
 hdfs dfs -mkdir user/ec2-user/raw
