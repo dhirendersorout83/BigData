@@ -12,11 +12,11 @@ hdfs dfs -mkdir user/ec2-user/raw/logs
 
 create sqoop jobs
 =============
-sqoop job --create customers_import -- import --connect jdbc:mysql://localhost:3306/Upgrad --username root --password 123 --table customers --incremental append --check-column customer_id --last-value 0 --target-dir /user/ec2-user/raw/mysql/customers
+sqoop job --create customers_import -- import --connect jdbc:mysql://localhost:3306/upgrad --username root --password 123 --table customers --incremental append --check-column customer_id --last-value 0 --target-dir /user/ec2-user/raw/mysql/customers
 
-sqoop job --create products_import -- import --connect jdbc:mysql://localhost:3306/Upgrad --username root --password 123 --table products --incremental append --check-column product_id --last-value 0 --target-dir /user/ec2-user/raw/mysql/products
+sqoop job --create products_import -- import --connect jdbc:mysql://localhost:3306/upgrad --username root --password 123 --table products --incremental append --check-column product_id --last-value 0 --target-dir /user/ec2-user/raw/mysql/products
 
-sqoop job --create orders_import -- import --connect jdbc:mysql://localhost:3306/Upgrad --username root --password 123 --table orders --incremental append --check-column order_id --last-value 0 --target-dir /user/ec2-user/raw/mysql/orders
+sqoop job --create orders_import -- import --connect jdbc:mysql://localhost:3306/upgrad --username root --password 123 --table orders --incremental append --check-column order_id --last-value 0 --target-dir /user/ec2-user/raw/mysql/orders
 
 Run the sqoop jobs
 ==================
@@ -32,13 +32,11 @@ customer_name(String), // Customers name.
 customer_gender(Char), // Customer gender. Only possible values are: Male, Female.
 created_at(Timestamp) 
 
-create table (customer_id(Integer) not null , 
-customer_name(String),
-customer_gender(Char),
-created_at(Timestamp) ,
-primary key(customer_id)
-constraint check_gender check(customer_gender in('M','F')) 
-);
+create table customers(customer_id int not null , 
+customer_name varchar(200),
+customer_gender Char,
+created_at Timestamp ,
+primary key(customer_id), constraint check_gender check(customer_gender in('M','F')) );
 
 //data in table
 LOAD DATA LOCAL INFILE '<path to csv>' INTO TABLE customers FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 ROWS;
