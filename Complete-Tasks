@@ -15,6 +15,8 @@ step 5: create hbase table and do hbase-hive integration(vice versa of step 1)
 
 Task3
 =====================================
+Check ec2-user mysql instance. check tables upgrad.customers and create sqoop job to download the data in hdfs
+
 Read Data from Hbase and Load into hbase using spark Program.
 
 Task4
