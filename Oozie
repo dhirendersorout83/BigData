@@ -1,1 +1,8 @@
 Oozie: What, Where and Why?
+
+Some of the advantages of using Oozie that were discussed in the video are:
+==============================================================================
+Oozie is designed for Hadoop clusters and can scale accordingly based on the size of the Hadoop cluster.
+Oozie has built-in Hadoop actions that make it easy for maintenance and troubleshooting purposes.
+The coordinator functionality of Oozie allows triggering of workflows at specified times. It also allows triggering of workflows on the basis of availability of data.
+Oozie provides a Web UI that allows users to check logs and examine the specific errors on the data nodes.
