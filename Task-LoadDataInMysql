@@ -1,0 +1,82 @@
+Load file to ec2-instance
+1. copy files to ec2-instance
+2. Create directories to import data from mysql. from there further we will move the data to hive/hbase
+3.
+hdfs dfs -mkdir user/ec2-user/raw
+hdfs dfs -mkdir user/ec2-user/raw/mysql
+hdfs dfs -mkdir user/ec2-user/raw/mysql/customers
+hdfs dfs -mkdir user/ec2-user/raw/mysql/products
+hdfs dfs -mkdir user/ec2-user/raw/mysql/orders
+hdfs dfs -mkdir user/ec2-user/raw/logs
+
+create sqoop jobs
+=============
+sqoop job --create customers_import -- import --connect jdbc:mysql://localhost:3306/Upgrad --username root --password 123 --table customers --incremental append --check-column customer_id --last-value 0 --target-dir /user/ec2-user/raw/mysql/customers
+
+sqoop job --create products_import -- import --connect jdbc:mysql://localhost:3306/Upgrad --username root --password 123 --table products --incremental append --check-column product_id --last-value 0 --target-dir /user/ec2-user/raw/mysql/products
+
+sqoop job --create orders_import -- import --connect jdbc:mysql://localhost:3306/Upgrad --username root --password 123 --table orders --incremental append --check-column order_id --last-value 0 --target-dir /user/ec2-user/raw/mysql/orders
+
+Run the sqoop jobs
+==================
+sqoop job -exec customers_import
+
+sqoop job -exec products_import
+
+sqoop job -exec orders_import
+
+================================
+customer_id(Integer),  // Customer’s unique identifier.
+customer_name(String), // Customers name.
+customer_gender(Char), // Customer gender. Only possible values are: Male, Female.
+created_at(Timestamp) 
+
+create table (customer_id(Integer) not null , 
+customer_name(String),
+customer_gender(Char),
+created_at(Timestamp) ,
+primary key(customer_id)
+constraint check_gender check(customer_gender in('M','F')) 
+);
+
+//data in table
+LOAD DATA LOCAL INFILE '<path to csv>' INTO TABLE customers FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 ROWS;
+
+product_id(Integer),  // Product’s unique identifier.
+product_name(String), // Product’s name.
+product_season(String), //Product season. Only possible values: Summer, Winter, Rainy, Generic
+product_gender(Char), // Customer gender. Only possible values are: Male, Female, Unisex.
+created_at(Timestamp) // The timestamp the record was created at. The Format is yyyy-MM-dd HH:mm:ss.
+
+=========================================== 
+product_id(Integer),  // Product’s unique identifier.
+product_name(String), // Product’s name.
+product_season(String), //Product season. Only possible values: Summer, Winter, Rainy, Generic
+product_gender(Char), // Customer gender. Only possible values are: Male, Female, Unisex.
+created_at(Timestamp) // The timestamp the record was created at. The Format is yyyy-MM-dd HH:mm:ss.
+
+ CREATE Table products (
+product_id INT, 
+product_name VARCHAR(100), 
+product_season VARCHAR(10), 
+product_gender VARCHAR(1), 
+created_at DATETIME,
+PRIMARY KEY (product_id));
+
+LOAD DATA LOCAL INFILE '<path to csv>’ INTO TABLE products FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 ROWS;
+
+========================================
+order_id(Integer), // Unique identifier for order
+product_id(Integer), // Unique identifier for product
+customer_id(Integer), // Unique identifier for customer
+created_at(Timestamp) // The timestamp the record was created at. The Format is yyyy-MM-dd HH:mm:ss.
+
+CREATE Table orders (
+order_id INT,
+customer_id INT,
+product_id INT,
+created_at DATETIME,
+PRIMARY KEY (order_id));
+
+LOAD DATA LOCAL INFILE '<path to csv>' INTO TABLE orders FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 ROWS;
+
