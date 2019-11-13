@@ -81,3 +81,10 @@ PRIMARY KEY (order_id));
 
 LOAD DATA LOCAL INFILE '<path to csv>' INTO TABLE orders FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 ROWS;
 
+Create hive table from row data using
+==================================
+use link to download the click stream data and use flume to upload the same
+https://learn.upgrad.com/v/course/305/session/47997/segment/262935
+
+Spark program to clean the click stream data
+===========================================
