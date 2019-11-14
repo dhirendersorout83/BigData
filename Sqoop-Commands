@@ -1,3 +1,5 @@
+Link https://sqoop.apache.org/docs/1.4.2/SqoopUserGuide.html#_importing_data_into_hive
+
 to resolve accumulo error
 sudo mkdir /var/lib/accumulo
 ACCUMULO_HOME=/var/lib/accumulo
