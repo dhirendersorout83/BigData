@@ -13,6 +13,11 @@ Step 3: Create HBase-Hive Mapping table
 Step 4: Load data into HBase from Hive
 step 5: create hbase table and do hbase-hive integration(vice versa of step 1)
 
+Task2.1 - 
+===================================
+create sqoop job to import data from mysql to hive table directly in hive internal and external table
+
+
 Task3
 =====================================
 Check ec2-user mysql instance. check tables upgrad.customers and create sqoop job to download the data in hdfs
