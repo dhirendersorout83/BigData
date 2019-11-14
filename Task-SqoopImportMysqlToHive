@@ -10,3 +10,16 @@ sqoop import --connect jdbc:mysql://localhost:3306/sqoopdemo
 --hive-import 
 --create-hive-table 
 --hive-table sqoop_workspace.customers
+
+Here’s what each individual Sqoop command option means:
+
+connect – Provides jdbc string
+username – Database username
+-P  – Will ask for the password in console. Alternatively you can use –password but this is not a good practice as its visible in your job execution logs and asking for trouble. One way to deal with this is store database passwords in a file in HDFS and provide at runtime.
+table – Tells the computer which table you want to import from MySQL. Here, it's customer.
+split-by – Specifies your splitting column. I am specifying id here.
+target-dir – HDFS destination directory.
+fields-terminated-by – I have specified comma (as by default it will import data into HDFS with comma-separated values)
+hive-import – Import table into Hive (Uses Hive’s default delimiters if none are set.)
+create-hive-table – Determines if set job will fail if a Hive table already exists. It works in this case.
+hive-table – Specifies <db_name>.<table_name>. Here it's sqoop_workspace.customers, where sqoop_workspace is my database and customers is the table name.
