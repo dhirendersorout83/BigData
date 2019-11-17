@@ -1,0 +1,39 @@
+Numeric Types
+=====================
+TINYINT (1-byte signed integer, from -128 to 127)
+SMALLINT (2-byte signed integer, from -32,768 to 32,767)
+INT/INTEGER (4-byte signed integer, from -2,147,483,648 to 2,147,483,647)
+BIGINT (8-byte signed integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807)
+FLOAT (4-byte single precision floating point number)
+DOUBLE (8-byte double precision floating point number)
+DOUBLE PRECISION (alias for DOUBLE, only available starting with Hive 2.2.0)
+DECIMAL
+Introduced in Hive 0.11.0 with a precision of 38 digits
+Hive 0.13.0 introduced user-definable precision and scale
+NUMERIC (same as DECIMAL, starting with Hive 3.0.0)
+
+
+Date/Time Types
+=====================
+TIMESTAMP (Note: Only available starting with Hive 0.8.0)
+DATE (Note: Only available starting with Hive 0.12.0)
+INTERVAL (Note: Only available starting with Hive 1.2.0)
+
+
+String Types
+=====================
+STRING
+VARCHAR (Note: Only available starting with Hive 0.12.0)
+CHAR (Note: Only available starting with Hive 0.13.0)
+
+Column Types
+===================
+Integral Types (TINYINT, SMALLINT, INT/INTEGER, BIGINT)
+Integral literals are assumed to be INT by default, unless the number exceeds the range of INT in which case it is interpreted as a BIGINT, or if one of the following postfixes is present on the number.
+
+TINYINT Y 100Y
+
+SMALLINT S 100S
+
+BIGINT L 100L 
+
