@@ -668,6 +668,7 @@ load data local inpath 'path' overwrite into table key_health_data;
 
 Step 3. Create table with subset of columns which is relevant for the queries
 ====================================================================
+LL_Crude_Birth_Rate_Cbr_Total,
 
 
 Step 4. Load data with subset columns in subset table in step 3. 
@@ -698,3 +699,8 @@ sqoop import --connect 'jdbc:mysql://localhost:3306/upgrad'
 --warehouse-dir /user/path/
 --split-by primaryKeyColumn
 
+==================================================
+Top two state:
+select firstname,salary from
+    (select firstname, salary from employee sort by salary desc limit 2)
+     result sort by salary limit 1;
