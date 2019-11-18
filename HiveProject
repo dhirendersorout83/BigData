@@ -646,10 +646,14 @@ ZZ_Sex_Ratio_At_Birth_Rural_Upper_Limit   DOUBLE ,
 ZZ_Sex_Ratio_At_Birth_Urban_Lower_Limit   DOUBLE ,
 ZZ_Sex_Ratio_At_Birth_Urban_Upper_Limit   DOUBLE 
 )
+normal table
+===================================
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
 STORED AS TEXTFILE
 LOCATION 'path'
 
+with org.apache.hadoop.hive.serde2.OpenCSVSerde
+==================================
 ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
 WITH SERDEPROPERTIES(
 "separatorChar"=",",
@@ -657,11 +661,36 @@ WITH SERDEPROPERTIES(
 "escapeChar"="\\"
 )
 
-//load data from file to hivetable
+
+Step 2. load data from file to hivetable
+====================================
 load data local inpath 'path' overwrite into table key_health_data;
 
-// sqoop import command from sql to hive
-===========================
+Step 3. Create table with subset of columns which is relevant for the queries
+====================================================================
+
+
+Step 4. Load data with subset columns in subset table in step 3. 
+====================================================================
+
+
+Step 5. with ORC format
+====================================================================
+Create external table table_name_ORC
+(columns)
+partitioned by (state_name varchar(100)) // exclude the column state_name from columns list in create statement
+stored as ORC
+location 'path'
+tblproperties("orc.compress"="SNAPPY")
+
+Step 6. dataload into ocr table
+================================
+insert into table_name_orc partition(state_name) select * from table_name;
+
+
+
+Step 7. sqoop import command from sql to hive
+===============================================
 sqoop import --connect 'jdbc:mysql://localhost:3306/upgrad'
 --username root
 --password 123 or -P
