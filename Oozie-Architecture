@@ -1,0 +1,43 @@
+Oozie Server:
+The Oozie server is a stateless web application to which the workflows are submitted by the client. In this scenario, a stateless server is nothing but a Java web application running in a Java servlet container.
+By default, Oozie uses Apache Tomcat as the server.
+
+Component of OOzie
+1.OOzie Client (To submit the job reqeust)
+2. OOzie Servered (To get the client request)
+3. HAdoopCLuster(To launce the launcher job and spowned the tasks to complete the job)
+4. SQL DB(To strore the jobs and states)
+
+Persistence Store or Database:
+====================================
+All the information about user requests, jobs etc. are stored in a SQL database.
+When a user request arrives at the Oozie server, the corresponding job/ request status is retrieved from the database, then the request is performed, and the status is updated.
+The transactional nature of the database ensures that no data is lost when the Oozie server crashes.
+Regular back-ups are taken as per requirements.
+
+The execution mechanism of the Hadoop jobs using Oozie can be summarised as follows:
+==========================================================================================
+On submission of a job by the Oozie client, the Oozie server doesn’t invoke the appropriate client(Hadoop, Hive, Pig etc.) on the same machine. Instead, it invokes a map-only MapReduce job with a single mapper in the Hadoop cluster. This job is also called a launcher job.
+
+This mapper/launcher job invokes the corresponding libraries for the submitted job. For instance, if the submitted job is a Hive query, then it's the launcher which invokes the Hive client to convert the high-level queries to MapReduce jobs.
+
+The launcher job also makes use of the underlying Hadoop cluster to look into the job completion and also address failures. This, in turn, helps in keeping the server stateless.
+
+Note:
+
+The launcher job waits for the actual tasks to finish before it exits.
+
+If the actual job itself is a MapReduce job, only then the launcher exits as soon as the actual task is started.
+
+The launcher job approach helps in detaching the Oozie server from concerns of completing the job. Since the Oozie server can schedule the launcher job on any node on the cluster, it requires all the application files to reside on the HDFS.
+
+Suppose that you have configured a Hadoop cluster on AWS. Then, the steps involved in a workflow execution are as follows:
+
+Before executing a workflow, the user needs to store the code jars, input data files and everything related to the workflow on the HDFS of AWS instance.
+
+The user submits the workflow to the Oozie server on AWS using the CLI or Java API. Note that the instance on which the Oozie server is running need not be a part of the Hadoop cluster. It may be an edge node as well.
+
+The Oozie server invokes a launcher map job on a node inside the Hadoop cluster.
+
+The launcher job invokes the appropriate clients, which in turn initiate the corresponding MapReduce tasks on the required nodes. The launcher job waits until the completion of the job.
+
