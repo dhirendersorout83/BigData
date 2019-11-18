@@ -6,3 +6,49 @@ Oozie is designed for Hadoop clusters and can scale accordingly based on the siz
 Oozie has built-in Hadoop actions that make it easy for maintenance and troubleshooting purposes.
 The coordinator functionality of Oozie allows triggering of workflows at specified times. It also allows triggering of workflows on the basis of availability of data.
 Oozie provides a Web UI that allows users to check logs and examine the specific errors on the data nodes.
+
+Oozie Features vis-a-vis Architecture
+=========================================
+Scalability and Reliability:
+============================
+Oozie follows a launcher job approach where the underlying Hadoop cluster takes care of the execution of actual jobs. Thus, it becomes horizontally scalable and capable of handling an increasing number of concurrent workflows, by increasing the number of compute nodes in a cluster.
+
+Oozie Maintains a persistence store that holds job state information and hence the responsibilities of workflows can be distributed across multiple servers easily, in case of server failure. In other words, you may configure multiple Oozie servers with a single shared database to keep track of job states.
+
+ 
+
+Multi-tenancy:
+====================
+Oozie is a multi-tenant system, i.e. multiple users can use the same Oozie system
+
+It takes care of constructs such as resource sharing and management, isolation, security, etc., transparently.
+
+It provides controlled access to the shared database instance (i.e. persistence store) for users, and the user data is segregated by an Oozie-designated identifier.
+
+Oozie provides data integrity and stores all the workflow codes or scripts of jobs in the underlying cluster storage, which is secure and can only be accessed by job owners.
+
+It also provides a flexible mechanism to maintain and control system resources and database utilisation.
+
+Security:
+========================
+Oozie provides both application level security and data security.
+
+It mandatorily checks the credentials of user jobs, ensuring authentication and authorisation against each incoming request for a specific resource.
+
+It supports Kerberos based authentication mechanism and honours Unix based user & group authorisation mechanisms. It also allows configuring users as super users.
+
+It provides a pluggable security framework that allows organisations to specify their own security mechanisms.
+
+Operability:
+==========================
+Oozie provides visibility of the operational characteristics of Hadoop workloads, through a UI and API.
+
+It provides extensive logs that help in detecting the operational issues.
+
+It offers a failure management mechanism with a recovery mode where the user, prior to workflow submission, can specify the steps to be performed in case of job failures. Automatic retries can also be configured with a specified number of retries.
+
+It determines the completion of jobs based on polling and callback techniques.
+
+The configuration in Oozie is externalised which helps in deployment automation across Hadoop instances.
+
+
