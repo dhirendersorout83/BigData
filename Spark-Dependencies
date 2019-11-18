@@ -1,0 +1,16 @@
+For HBase client for java.
+===============================
+You  can use the following hbase client version for spark 2.3.1
+Note: HBase-Spark integration libraries are provided in the HBase-3.0.0 which yet to release.
+
+<dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+            <version>1.2.4</version>
+  </dependency>
+
+<dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-core_2.11</artifactId>
+            <version>2.3.1</version>
+        </dependency>
