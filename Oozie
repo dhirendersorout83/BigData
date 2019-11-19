@@ -78,4 +78,34 @@ First example
 	</kill>
 	<end name="finish"/>
 </workflow-app>
+<workflow-app name="hdfs-workflow-01" xmlns="uri:oozie:workflow:0.4">
+<start to="create_dir">
 
+============first action==============
+<action name="create_dir">
+<fs>
+<name-node>hdfs://quickstart.cloudera:8020</name-node>
+<mkdir path="/test/app"/>
+</fs>
+<ok to="move_data" />
+<error to="kill_create_dir" />
+</action>
+
+============second action==============
+<action name="move_data">
+<fs>
+<name-node>hdfs://quickstart.cloudera:8020</name-node>
+<move source="/files_oozie/app" target="/test/app"/>
+</fs>
+<ok to="finish" />
+<error to="kill_move_data" />
+</action>
+
+<kill name="kill_create_dir">
+<message>Error in job 1</message>
+</kill>
+<kill name="kill_move_data">
+<message>Error in job 2</message>
+</kill>
+<end name="finish">
+</workflow-app>
