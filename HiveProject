@@ -673,14 +673,36 @@ LL_Total_Fertility_Rate_Total // for fertility rate
 corelation_function//State wise child mortality rate and state wise fertility rate and does high fertility correlate with high child mortality?
 BB_Average_Household_Size_All_Total //Find top 2 districts per state with the highest population per household
 CC_Sex_Ratio_All_Ages_Total//Find top 2 districts per state with the lowest sex ratios
+CREATE EXTERNAL TABLE key_health_data_ss
+(
+state_district_name varchar2(100),
+YY_Under_Five_Mortality_Rate_U5MR_Total_Person DOUBLE,
+LL_Total_Fertility_Rate_Total DOUBLE,
+BB_Average_Household_Size_All_Total DOUBLE,
+CC_Sex_Ratio_All_Ages_Total DOUBLE
+)
+partitioned by (state_name varchar(100))
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+WITH SERDEPROPERTIES(
+"separatorChar"=",",
+"quoteChar"="'",
+"escapeChar"="\\"
+)
+
 Step 4. Load data with subset columns in subset table in step 3. 
 ====================================================================
 
 
 Step 5. with ORC format
 ====================================================================
-Create external table table_name_ORC
-(columns)
+Create external table key_health_data_ss_orc
+(
+state_district_name varchar2(100),
+YY_Under_Five_Mortality_Rate_U5MR_Total_Person DOUBLE,
+LL_Total_Fertility_Rate_Total DOUBLE,
+BB_Average_Household_Size_All_Total DOUBLE,
+CC_Sex_Ratio_All_Ages_Total DOUBLE
+)
 partitioned by (state_name varchar(100)) // exclude the column state_name from columns list in create statement
 stored as ORC
 location 'path'
