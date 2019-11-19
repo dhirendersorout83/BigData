@@ -51,4 +51,31 @@ It determines the completion of jobs based on polling and callback techniques.
 
 The configuration in Oozie is externalised which helps in deployment automation across Hadoop instances.
 
+Oozie Workflow
+===========================================================
+First example
+
+<workflow-app name="hdfs-sample-wf" xmlns="uri:oozie:workflow:0.4">
+	<start to="create_dir"/>
+	<action name="create_dir">
+		<fs>
+			<name-node>hdfs://quickstart.cloudera:8020</name-node>
+			<mkdir path='/test/oozie'/>
+		</fs>
+		<ok to="move_data"/>
+		<error to="kill_sample_wf"/>
+	</action>
+	<action name="move_data">
+		<fs>
+			<name-node>hdfs://quickstart.cloudera:8020</name-node>
+			<move source='/files_oozie/app' target='/test/oozie'/>
+		</fs>
+		<ok to="finish"/>
+		<error to="finish"/>
+	</action>
+	<kill name="kill_sample_wf">
+		<message>Error in creating target directory</message>
+	</kill>
+	<end name="finish"/>
+</workflow-app>
 
