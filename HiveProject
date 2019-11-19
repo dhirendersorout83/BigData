@@ -671,7 +671,8 @@ Step 3. Create table with subset of columns which is relevant for the queries
 LL_Crude_Birth_Rate_Cbr_Total, // for mortality rate
 AA_Ever_Married_Women_Aged_15_49_Years_Total // for fertility rate
 LL_Mean_Number_Of_Children_Ever_Born_To_Women_15_49_Years_Total // for fertility rate
-
+AA_Households_Total //household
+AA_Population_Total //household
 
 Step 4. Load data with subset columns in subset table in step 3. 
 ====================================================================
