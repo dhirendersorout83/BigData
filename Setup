@@ -2,3 +2,5 @@ CDH Version 5.15.1
 
 Hbase Version : 1.5
 Spark Version : 2.3.0
+
+spark2-submit --class com.upgrad.Driver --master yarn --deploy-mode cluster --executor-memory 1g --name myhbase --conf "spark.app.id=hbase01" MavenHBase-0.0.1-SNAPSHOT.jar mytable1 mytable2
