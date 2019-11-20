@@ -664,7 +664,7 @@ WITH SERDEPROPERTIES(
 
 Step 2. load data from file to hivetable
 ====================================
-load data local inpath 'path' overwrite into table key_health_data;
+load data local inpath '/home/cloudera/Desktop/data.csv' overwrite into table key_health_data;
 
 Step 3. Create table with subset of columns which is relevant for the queries
 ====================================================================
@@ -675,44 +675,78 @@ BB_Average_Household_Size_All_Total //Find top 2 districts per state with the hi
 CC_Sex_Ratio_All_Ages_Total//Find top 2 districts per state with the lowest sex ratios
 CREATE EXTERNAL TABLE key_health_data_ss
 (
-state_district_name varchar2(100),
+state_name varchar(100),
+state_district_name varchar(100),
 YY_Under_Five_Mortality_Rate_U5MR_Total_Person DOUBLE,
 LL_Total_Fertility_Rate_Total DOUBLE,
 BB_Average_Household_Size_All_Total DOUBLE,
 CC_Sex_Ratio_All_Ages_Total DOUBLE
 )
-partitioned by (state_name varchar(100))
-ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-WITH SERDEPROPERTIES(
-"separatorChar"=",",
-"quoteChar"="'",
-"escapeChar"="\\"
-)
+row format delimited fields terminated by ','
+stored as textfile
+location '/user/hive/warehouse/key_heath_data_ss';
 
 Step 4. Load data with subset columns in subset table in step 3. 
 ====================================================================
-
+insert into table key_health_data_ss
+select state_name,state_district_name,YY_Under_Five_Mortality_Rate_U5MR_Total_Person,
+LL_Total_Fertility_Rate_Total,
+BB_Average_Household_Size_All_Total,CC_Sex_Ratio_All_Ages_Total from key_health_data;
 
 Step 5. with ORC format
 ====================================================================
 Create external table key_health_data_ss_orc
 (
-state_district_name varchar2(100),
+state_name varchar(100),
+state_district_name varchar(100),
 YY_Under_Five_Mortality_Rate_U5MR_Total_Person DOUBLE,
 LL_Total_Fertility_Rate_Total DOUBLE,
 BB_Average_Household_Size_All_Total DOUBLE,
 CC_Sex_Ratio_All_Ages_Total DOUBLE
 )
-partitioned by (state_name varchar(100)) // exclude the column state_name from columns list in create statement
 stored as ORC
-location 'path'
-tblproperties("orc.compress"="SNAPPY")
+location '/user/hive/warehouse/key_health_data_ss_orc'
+tblproperties("orc.compress"="SNAPPY");
 
-Step 6. dataload into ocr table
-================================
-insert into table_name_orc partition(state_name) select * from table_name;
+insert into table key_health_data_ss_orc
+select state_name,state_district_name,YY_Under_Five_Mortality_Rate_U5MR_Total_Person,
+LL_Total_Fertility_Rate_Total,
+BB_Average_Household_Size_All_Total,CC_Sex_Ratio_All_Ages_Total from key_health_data_ss;
 
+Step 6. with ORC format with partition
+====================================================================
+Create external table key_health_data_ss_orc_part
+(
+statename varchar(100),
+state_district_name varchar(100),
+YY_Under_Five_Mortality_Rate_U5MR_Total_Person DOUBLE,
+LL_Total_Fertility_Rate_Total DOUBLE,
+BB_Average_Household_Size_All_Total DOUBLE,
+CC_Sex_Ratio_All_Ages_Total DOUBLE
+)
+partitioned by(state_name string)
+stored as ORC
+location '/user/hive/warehouse/key_health_data_ss_orc_part'
+tblproperties("orc.compress"="SNAPPY");
 
+insert into table key_health_data_ss_orc_part partition(state_name)
+select state_name,state_district_name,YY_Under_Five_Mortality_Rate_U5MR_Total_Person,
+LL_Total_Fertility_Rate_Total,
+BB_Average_Household_Size_All_Total,CC_Sex_Ratio_All_Ages_Total,state_name from key_health_data_ss_orc;
+
+Queries
+========================================
+1. select state_name,avg(YY_Under_Five_Mortality_Rate_U5MR_Total_Person) mortality_rate
+from key_health_data_ss_orc_part where state_name='Assam'
+group by state_name;
+
+vs simple
+
+select state_name,avg(YY_Under_Five_Mortality_Rate_U5MR_Total_Person) mortality_rate
+from key_health_data_ss where state_name='Assam'
+group by state_name;
+
+2.
 
 Step 7. sqoop import command from sql to hive
 ===============================================
