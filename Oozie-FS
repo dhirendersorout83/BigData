@@ -1,0 +1,10 @@
+mkdir:
+
+delele : <delete path>:  This tag specifies the path of the file/directory to be deleted.
+
+move:
+
+touchz: <touchz path>: This tag specifies the directory path to perform the touchz operation, i.e. to create a zero-length file in the specified path.
+
+chmod: <chmod path, permissions, dir-files>: It specifies the path of the directory/file whose permissions you need to change. The permissions are specified as Unix symbolic notation eg: -rwxrw-rw- or as octal representations 755 etc. The dir-files attribute must be set to true/false accordingly to apply the chmod command to the directory, with/without affecting the files within it.
+<chmod path='/home/dir1' permission='755' dir_files='false'/>
