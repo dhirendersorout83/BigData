@@ -650,7 +650,7 @@ normal table
 ===================================
 ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
 STORED AS TEXTFILE
-LOCATION 'path'
+LOCATION '/user/hive/warehouse/Key_indicator_districtwise'
 
 with org.apache.hadoop.hive.serde2.OpenCSVSerde
 ==================================
