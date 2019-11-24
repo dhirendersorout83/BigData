@@ -784,12 +784,13 @@ sqoop import --connect 'jdbc:mysql://upgradawsrds.cpclxrkdvwmz.us-east-1.rds.ama
 --username upgraduser
 --password upgraduser or -P
 --table Key_indicator_districtwise
---warehouse-dir /user/ec2-user/Key_indicator_districtwise
+--target-dir /user/ec2-user/Key_indicator_districtwise
+--
 --split-by state_name
 
 to increamental import
 ==============
-sqoop import --connect "jdbc:mysql://upgradawsrds.cpclxrkdvwmz.us-east-1.rds.amazonaws.com:3306/indiaahs2012_13" --username upgraduser --password upgraduser --table data --hive-import --hive-table datahive --fields-terminated-by "," -m 1 --incremental lastmodified --check-column join_date --last-value "2017-01-01"
+sqoop import --connect "jdbc:mysql://upgradawsrds.cpclxrkdvwmz.us-east-1.rds.amazonaws.com:3306/indiaahs2012_13" --username upgraduser --password upgraduser --table data --incremental append -m 1 --check-column ID --last-value 0
 
 sqoop job --create card_member_job -- import --connect jdbc:mysql://rds.amazonaws.com/financials_data --username username --password upgraduser --table table_name -m 10 --incremental append --check-column joining_dt --last-value '1901-01-01 01:00:00.0' --target-dir /cproject/card_member;
 
