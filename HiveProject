@@ -791,6 +791,8 @@ to increamental import
 ==============
 sqoop import --connect "jdbc:mysql://upgradawsrds.cpclxrkdvwmz.us-east-1.rds.amazonaws.com:3306/indiaahs2012_13" --username upgraduser --password upgraduser --table data --hive-import --hive-table datahive --fields-terminated-by "," -m 1 --incremental lastmodified --check-column join_date --last-value "2017-01-01"
 
+sqoop job --create card_member_job -- import --connect jdbc:mysql://rds.amazonaws.com/financials_data --username username --password upgraduser --table table_name -m 10 --incremental append --check-column joining_dt --last-value '1901-01-01 01:00:00.0' --target-dir /cproject/card_member;
+
 ==================================================
 Top two state:
 select firstname,salary from
