@@ -724,10 +724,25 @@ LL_Total_Fertility_Rate_Total,
 BB_Average_Household_Size_All_Total,CC_Sex_Ratio_All_Ages_Total,state_name from key_indicator_districtwise_orc;
 
 
+5. select * from (
+select state_name,state_district_name,CC_Sex_Ratio_All_Ages_Total,
+dense_rank() over (partition by state_name order by CC_Sex_Ratio_All_Ages_Total) rank_no
+from key_indicator_districtwise_orc_part
+) subset where subset.rank_no <=2;
+
+4. select * from (
+select 
+state_name,state_district_name,BB_Average_Household_Size_All_Total,
+dense_rank() over (partition by state_name order by BB_Average_Household_Size_All_Total desc) rank_no
+from key_indicator_districtwise_orc_part
+) subset where subset.rank_no <=2;
 
 
-
-
+3. select state_name,avg(YY_Under_Five_Mortality_Rate_U5MR_Total_Person) mortality_rate
+,avg(LL_Total_Fertility_Rate_Total) Fertility_Rate
+,corr(YY_Under_Five_Mortality_Rate_U5MR_Total_Person,LL_Total_Fertility_Rate_Total) Correlation
+from key_indicator_districtwise_orc_part where state_name='Assam'
+group by state_name;
 
 
 
