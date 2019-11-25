@@ -745,5 +745,19 @@ from key_indicator_districtwise_orc_part where state_name='Assam'
 group by state_name;
 
 
+Hbase HIve Integration
+===========================
+CREATE EXTERNAL TABLE key_indicator_districtwise_hbase
+(
+state_name varchar(100),
+state_district_name varchar(100),
+YY_Under_Five_Mortality_Rate_U5MR_Total_Person DOUBLE,
+LL_Total_Fertility_Rate_Total DOUBLE,
+BB_Average_Household_Size_All_Total DOUBLE,
+CC_Sex_Ratio_All_Ages_Total DOUBLE
+)
+STORED AS 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'
+WITH SERDEPROPERTIES("hbase.columns.mapping"=":key,cf:state_name,cf:state_district_name,cf:YY_Under_Five_Mortality_Rate_U5MR_Total_Person,cf:LL_Total_Fertility_Rate_Total,cf:BB_Average_Household_Size_All_Total,cf:CC_Sex_Ratio_All_Ages_Total")
+TBLPROPERTIES ("hbase.table.name" = "key_indicator_districtwise_hive");
 
 
