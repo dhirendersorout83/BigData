@@ -778,7 +778,7 @@ from key_health_data_ss_orc_part
 group by state_name,state_district_name,CC_Sex_Ratio_All_Ages_Total
 ) subset where subset.rank_no <=2;
 
-Step 7. sqoop import command from sql to hive
+Step 7. sqoop import command from sql to hive via HDFS
 ===============================================
 sqoop import --connect 'jdbc:mysql://upgradawsrds.cpclxrkdvwmz.us-east-1.rds.amazonaws.com:3306/indiaahs2012_13'
 --username upgraduser
@@ -793,6 +793,16 @@ to increamental import
 sqoop import --connect "jdbc:mysql://upgradawsrds.cpclxrkdvwmz.us-east-1.rds.amazonaws.com:3306/indiaahs2012_13" --username upgraduser --password upgraduser --table data --incremental append -m 1 --check-column ID --last-value 0
 
 sqoop job --create card_member_job -- import --connect jdbc:mysql://rds.amazonaws.com/financials_data --username username --password upgraduser --table table_name -m 10 --incremental append --check-column joining_dt --last-value '1901-01-01 01:00:00.0' --target-dir /cproject/card_member;
+
+Direct import to hive tbale
+===========================
+sqoop import --connect jdbc:mysql://quickstart.cloudera:3306/sqoopdemo --username root --password cloudera --table emp 
+--hive-overwrite 
+--hive-table hiveproject.emp 
+--split-by no 
+--check-column no 
+--last-value 10 
+--incremental append;
 
 ==================================================
 Top two state:
