@@ -1,2 +1,29 @@
-# 1 Stages are directly proportion to no of RDD's. In which case stages limited to lower?
-# <h1> line2
+Spark: In  memory processing syste m for processing of big data.
+
+
+HDFS is a disk-based storage system, and using it frequently while processing data to store intermediate results is time-consuming. In this video, you will learn, in detail, why retrieving data from disk-based systems takes a considerable amount of time.
+You are now aware of the three delays while accessing data from a disk. They are as follows:
+================================================
+Seek time: The time required to move the read/write head from its current position to a new position (or track) within a disk.
+Rotational delay: The time taken by a disk to rotate under the read/write head till it points to the beginning of the data chunk to be read.
+Transfer time: The time taken to read a complete sector or a data chunk.
+
+Access time is the time delay or latency between when a request to read data is submitted, and the requested data is returned by the disk. The access time of a disk is calculated by adding all the delays. i.e.
+
+Access Time  = Seek time + Rotational delay + Transfer time
+
+Hadoop is designed to provide high throughput, but it cannot provide instantaneous results for any query. As already discussed, it uses a disk-based storage system known as the HDFS. Some of the factors behind the delayed responses in Hadoop are as follows:
+
+Hadoop is designed to read an entire dataset even if there is a requirement to analyse only a portion of the data.
+
+To avoid disk seeks, Hadoop encourages the sequential access of data. Random access to data is not possible even if there is a need to access only one record that’s located in the middle of a file.
+======================================================
+As Hadoop is more suited for batch processing, there was a need for different techniques that could process data in real time and generate instantaneous results. Hence, in-memory processing came into existence, which can load an entire dataset into memory and perform analytics on the data present in memory. In the following video, you will learn more about in-memory processing and its advantages.
+
+So, some of the benefits of in-memory processing are —
+==========================================================
+It is used extensively for real-time processing.
+
+It is excellent when a query is interested in a single row out of millions of rows that are available in a dataset.
+
+It is well suited for iterative applications in which the task is to process the same data repeatedly. All of the intermediate output generated is also stored in memory, saving you from time-consuming disk I/O operations.
