@@ -1,0 +1,73 @@
+Mapreduce was not suitable for iterative job and ad hoc queries as after each iterations, intermediate job output write to disk which is expensive.
+
+The two major reasons why Spark has gained popularity today are —
+Speed: Due to in-memory processing, Spark processes data with lightning speed.
+Generality: Spark can be used for a variety of tasks such as batch, interactive, streaming, etc. It also supports APIs in various languages such as Python, Java, Scala, etc.
+
+
+
+RDD
+============================
+The most fundamental data structure used for Spark in-memory computation is known as Resilient Distributed Dataset or an ‘RDD’. A series of operations can be performed on RDDs, and the RDDs along with the operations are represented using a ‘directed acyclic graph’(DAG). This DAG is helpful in optimising the operations. You will learn more about DAGs and its various uses in the segment "Lazy Evaluation in Spark".
+
+
+DAG
+==================
+Directed Acyclic Graph(DAG) conctructed using all the operators used in a job
+Represent a sequence of computations expressed by operators
+Each node is RDD
+Each edge is operators
+
+
+Architecture
+
+Driver/Master ====================> Executors/Slaves
+
+Driver runs the user's code and develope the spark context. SC is heart of the spark applications.
+
+
+SparkContext used to:
+creating RDDs
+Running and cancelling jobs
+Getting status of spark application
+
+Driver program translates created RDDs and build the DAG
+
+SparkContext at execution, splits the DAG into multiple stages. eg many map operators can be schedule in a single stage. 
+Then driver program passes all the task to scheduler(in cluster manager) which then assigns the task to different executors/workerNodes/Slave machines.
+
+Worker node stored the intermediate output to RAM/Cache or HardDisc. 
+Spark cahces the data to be processed, So makes it 10 time faster than mapreduce.
+
+The roles and responsibilities of the master, slave, and cluster manager are given below in detail:
+
+ 
+
+Spark Master
+================================================
+The driver program runs on the master node.
+The driver is responsible for creating a SparkContext. However big or small the Spark job, a SparkContext is mandatory to run it.
+The driver monitors the end to end execution of a Spark program.
+
+ 
+
+Spark Slave
+=================================
+Slaves are the nodes on which executors run.
+Executors are processes that run smaller tasks that are assigned by the driver.
+They store computed results either in memory, cache or on hard disks.
+
+ 
+
+Cluster Manager
+========================
+The cluster manager is responsible for providing the resources required to run tasks on the cluster.
+The driver program negotiates with the cluster manager to get the required resources, such as the number of executors, the CPU, the memory, etc.
+
+
+Spark can run in multiple cluster managers such as YARN and Mesos. In this lecture, you learnt how Spark works with YARN cluster manager. Spark uses YARN in two modes. They are:
+Client Mode
+Cluster Mode
+
+
+
