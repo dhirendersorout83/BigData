@@ -1,0 +1,54 @@
+Various components in the Spark ecosystem are:
+
+
+Spark Core (or Apache Spark) 
+==========================================================
+Spark Core is the central processing engine of the Spark application.
+
+It acts as an interface between Spark components and the components of a big data processing architecture such as Yarn, the HDFS, etc.
+
+It provides an execution platform for all Spark applications.
+
+Spark Core makes use of a data structure known as an RDD, i.e. Resilient Distributed Dataset for performing in-memory transformations on a huge dataset.
+
+Some of the other critical responsibilities of Spark Core are memory management, fault recovery, and the scheduling and distribution of jobs across worker nodes.
+
+ 
+
+Spark SQL 
+==========================================================
+Spark SQL allows users to run SQL queries on top of Spark.
+
+With it, the processing of structured and semi-structured data is quite convenient.
+
+Spark SQL also introduced data frames and datasets that could impose a schema on RDDs, which are schemaless.
+
+ 
+
+Spark Streaming
+==========================================================
+The Spark Streaming module processes streaming data in real time. Some of the popular streaming data sources are web server logs, data from social networking websites, such as Twitter feed, etc.
+
+Behind the scenes, the Spark Streaming module receives input data streams and divides them into mini-batches. Each mini-batch is processed independently, and the final stream of output data is also produced in batches.
+
+The Spark Streaming API resembles the Spark Core API, which makes the life of a developer more comfortable as he/she works on batch processing and streaming data at the same time.
+
+In the upcoming courses, you will be learning Spark streaming in detail.
+
+ 
+
+Spark MLlib
+==========================================================
+MLlib is a machine learning library that is used to run machine learning algorithms on big data sets that are distributed across a cluster of machines.
+
+It provides APIs for common machine learning algorithms such as clustering, classification, and generic gradient descent. These algorithms are used in the industry for sentimental analysis or predictive analysis.
+
+Due to in-memory processing in Spark, iterative algorithms such as clustering take very little time when compared to other machine learning libraries such as Mahout, which uses the Hadoop ecosystem.
+In the upcoming courses, you will be learning about Spark MLlib in detail.
+
+ 
+
+Spark GraphX
+==========================================================
+The GraphX API allows a user to view data as a graph and combine graphs with RDDs.
+It provides an API for common graph algorithms such as Connect components and PageRank.
