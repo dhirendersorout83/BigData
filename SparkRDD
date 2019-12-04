@@ -38,3 +38,4 @@ In the above code "in/u.data" is the relative address of the file "u.data".
  
 
 Paired RDDs are created by transforming a basic RDD to pairedRDD using various transformation operations such as mapToPair and flatMapToPair. You will learn these operations in detail in the upcoming sessions.
+
