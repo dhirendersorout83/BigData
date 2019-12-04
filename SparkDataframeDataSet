@@ -1,0 +1,26 @@
+SparkSQL introduced two data structures which can store the distributed data along with a schema. They are:
+
+Dataframe
+========================================
+Introduced in spark 1.3
+Abstraction of relational data with named columns
+Contains all the features of RDD
+Follow lazy evaluation
+Datafram API provide sql like queries eg group by , order by
+Dataframe API is not completely type safe and does not flag compile time error for non existing columns
+
+
+Dataset 
+===================================
+Introduced in spark 1.6
+Combined feature of RDD and dataframe
+Provide compile time safety feature
+Provide concept of encoders and decoders which help in translation of JVM object to spark internal binary format and vice versa. Encodes allowed to access indivdual columns and attribute data without deserialize the entire JVM objects and reduce the desrializwed efforts.
+
+
+From Spark 2.x, the untyped features of Spark Dataframe and typed features of Spark Dataset have merged into single API i.e. Dataset. A Dataframe is represented by a Dataset of type "Row" where "Row" is an untyped generic JVM object.
+
+All dataframes are datasets but all datasets are not dataframes
+======================================================================
+
+
