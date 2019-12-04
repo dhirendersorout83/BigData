@@ -1,0 +1,12 @@
+Introducing RDDs
+According to the first white paper released for RDDs, an RDD is a distributed memory abstraction that lets programmers perform in-memory computations on large clusters, in a fault-tolerant manner. The acronym 'RDD' can be expanded as Resilient Distributed Dataset. Some important features of an RDD are as follows:
+
+The term 'RDD' is expanded as Resilient Distributed Dataset, where 'Resilient' refers to fault-tolerant, 'Distributed' refers to data that resides across multiple interconnected nodes, and 'Dataset' is a collection of partitioned data.
+
+RDDs are Spark Core’s abstraction for working with data. In other words, an RDD is a core object that is often used to deal with data in Spark.
+
+An RDD is a fundamental data structure of Spark that is immutable and read-only.
+
+RDDs can include any Python, Java, or Scala objects, or even user-defined classes.
+
+Each dataset is divided into logical partitions that may be computed on different nodes of a cluster. Then, under the hood, Spark distributes the data contained in the RDD internally, among the clusters, and parallelises the operation that you perform on it.
