@@ -1,0 +1,56 @@
+import org.apache.spark.SparkConf;
+import org.apache.spark.api.java.JavaSparkContext;
+//for Function inner class
+import prg.apache.spark.api.java.function.Function;
+
+import java.util.Arrays;
+import java.util.List;
+
+public void main(String[] args){
+SparkCong conf = new SparkConf().setAppName("First App name").setMaster("local[*]");
+JavaSparkContext sc = new JavaSparkContext(conf);
+
+//creating java RDD
+JavaRDD<Integer> javaRdd = sc.parallelize(Arrays.toList(1,2,3,4,5));
+
+//two ways to access content of RDD
+//1. by foreach method. foreach method dont maintain the order of elements
+javaRdd.foreach(x -> System.out.println(x));
+
+//2. call the collect method of rdd
+List<Integer> intRddlist = javaRdd.collect();
+
+for(int x:intRddlist)
+System.out.println(x)
+
+// map transformation on RDD
+// squaring the elements of RDD
+JavaRDD<Integer> squareRdd = intRddlist.map(x -> x*x)
+
+// even interger
+JavaRDD<Integer> filterRdd = intRddlist.filter( x%2 == 0 )
+or 
+JavaRDD<Integer> filterRdd = intRddlist.filter( x-> x%2 == 0 ? true : false )
+
+//same can be done using anonymous inner class
+JavaRDD<Integer> filterRddOld = intRddlist.filter( 
+				new Function<Integer,Boolean>(){
+				 // implement the Boolean call method defined in interface
+				}
+			)
+
+// how to create paired RDD from rdd
+
+JavaRDD<String> stringRdd = sc.parallelize(Arrays.toList("pig","pig","hadoop"));
+
+// can use transformation like mapToPair / flatmapToPair
+// for paired rdd we need a touple2 element
+JavaPairRDD stringPairRdd = stringRdd.mapToPair( x-> new Tuple2<String,Integer>(x,1))
+stringPairRdd.foreach( x-> System.out.println( x._1 +" "+ x._2 ))
+
+// count of words
+JavaPairRDD countRdd = stringPairRdd.reduceByKey( (x,y) -> (x+y) )
+countRdd.foreach( x-> System.out.println( x._1 +" "+ x._2 ))
+
+}
+=========================================================
