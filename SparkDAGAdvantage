@@ -1,1 +1,17 @@
+Lazy Evaluation in Spark
+=======================================
+The word "Lazy" means "unwilling to work at the same time".  Spark also does the same thing, i.e. it evaluates something only when it is needed. The transformations in Spark are not performed as soon as they are encountered. All the transformations performed on an RDD are stored in a Directed Acyclic Graph aka DAG. The DAG is executed only when an action is performed on an RDD. This is known as lazy evaluation in Spark.
+Lazy evaluation allows Spark to analyse all the transformations in the DAG and optimise the operations present in the DAG. Here optimisation refers to eliminating redundant steps or merging logically independent tasks into a single parallel step.
 
+
+Some benefits of lazy evaluation are:
+=========================================
+Reduction in complexities: Lazy evaluation avoids execution of all the operations. Internally the operations are optimised and the number of executable operations is reduced. This reduction in operations generates less intermediate data, and the task executes faster.
+Saves computation and increases speed: As all the operations are not performed, and only those operations or values are computed which are required, this reduces the time and space complexity.
+Fault tolerance: Due to lineage graphs and lazy evaluation, Spark is well aware of the steps in advance to create an RDD. So, if a partition of an RDD is lost, it can be efficiently computed from the previous level in DAG without performing all the steps.
+
+ADvantages of DAG
+==========================================
+1. Performance improved by re scheduling the consecutive map steps present in the DAG in a single task.
+
+2. DAG makes RDD fault tolerant. As DAG is operator graphs which hold every details of transformations applied. if some data partitions in RDD lost then SPARK USES LINEAGE GRAPH of that particular RDD for recalculating the last partitions by applying the transformation on the parent RDD of the affected RDD without having to perform the operation from the starting RDDs.
