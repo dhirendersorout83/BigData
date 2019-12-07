@@ -24,3 +24,59 @@ All dataframes are datasets but all datasets are not dataframes
 ======================================================================
 
 
+3. Need of Dataset in Spark
+================================================================
+To overcome the limitations of RDD and Dataframe, Dataset emerged. In DataFrame, there was no provision for compile-time type safety. Data cannot be altered without knowing its structure. In RDD there was no automatic optimization. So for optimization, we do it manually when needed.
+
+4. Features of Dataset in Spark
+================================
+After having the introduction to dataSet, let’s now discuss various features of Spark Dataset-
+
+a. Optimized Query
+Dataset in Spark provides Optimized query using Catalyst Query Optimizer and Tungsten. Catalyst Query Optimizer is an execution-agnostic framework. It represents and manipulates a data-flow graph. Data flow graph is a tree of expressions and relational operators. By optimizing the Spark job Tungsten improves the execution. Tungsten emphasizes the hardware architecture of the platform on which Apache Spark runs.
+
+b. Analysis at compile time
+Using Dataset we can check syntax and analysis at compile time. It is not possible using Dataframe, RDDs or regular SQL queries.
+
+c. Persistent Storage
+Spark Datasets are both serializable and Queryable. Thus, we can save it to persistent storage.
+
+d. Inter-convertible
+We can convert the Type-safe dataset to an “untyped” DataFrame. To do this task Datasetholder provide three methods for conversion from Seq[T] or RDD[T] types to Dataset[T]:
+
+toDS(): Dataset[T]
+toDF(): DataFrame
+toDF(colNames: String*): DataFrame
+e. Faster Computation
+The implementation of the Dataset is much faster than the RDD implementation. Thus increases the performance of the system. For the same performance using the RDD, the user manually considers how to express computation that parallelizes optimally.
+
+f. Less Memory Consumption
+While caching, it creates a more optimal layout. Spark knows the structure of data in the dataset.
+
+g. Single API for Java and Scala
+It provides a single interface for Java and Scala. This unification ensures we can use Scala interface, code examples from both languages. It also reduces the burden of libraries. As libraries have no longer to deal with two different type of inputs.
+
+Apache Spark Quiz
+5. Creating Dataset
+To create a Dataset we need:
+
+a. SparkSession
+
+SparkSession is the entry point to the SparkSQL. It is a very first object that we create while developing Spark SQL applications using fully typed Dataset data abstractions. Using SparkSession.Builder, we can create an instance of SparkSession. And can stop SparkSession using the stop method (spark.stop).  
+
+b. QueryExecution
+
+We represent structured query execution pipeline of the dataset using QueryExecution. To access QueryExecution of a Dataset use QueryExecution attribute. By executing a logical plan in Spark Session we get QueryExecution.
+executePlan(plan: LogicalPlan): QueryExecution
+executePlan executes the input LogicalPlan to produce a QueryExecution in the current SparkSession.
+
+c. Encoder
+
+An encoder provides conversion between tabular representation and JVM objects. With the help of the encoder, we serialize the object. Encoder serializes objects for processing or transmitting over the network encoders.
+
+So, this was all in Spark Dataset Tutorial. Hope you like our explanation.
+
+6. Conclusion
+Hence, in conclusion to Dataset, we can say it is a strongly typed data structure in Apache Spark. Moreover, it represents structured queries. Also, it fuses together the functionality of RDD and DataFrame. We can generate the optimized query using Dataset. So, Dataset lessens the memory consumption and provides a single API for both Java and Scala.
+
+If you like this post and feel that I have missed any point, so, do let me know by leaving a comment.
