@@ -1,5 +1,28 @@
 The Javadoc API documents are available online. In particular, you should read the package overview of the 
 org.apache.commons.dbcp2
-object Container{
 
+import org.apache.log4j._
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.{DataFrame,SparkSession}
+import org.apache.spark.sql.function._
+import org.apache.spark.sql.Row
+
+import org.apache.spark.SparkConf
+import org.apache.spark.storage.StorageLevel
+
+import java.io.{File,PrintWriter}
+
+object Container{
+def getDataSource()={
+  val dbUrl = "jdbc:mysql://com.com.server:1551/db_name"
+  val connectionPool = new BasicDataSource()
+  connectionPool.setUserName=""
+  connectionPool.setPassword()
+  connectionPool.setUrl(dbUrl)
+  connectionPool.setMaxTotal("3")
+  connectionPool.setMaxIdle("3")
+  connectionPool.setMaxWaitMillis(5000)
+  connectionPool.setInitialSize(3)
+  connectionPool
+}
 }
