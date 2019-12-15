@@ -10,7 +10,7 @@ product,category,revenue
 
 We want to answer two questions:
 What are the best-selling and the second best-selling products in every category?
-
+--------------------------------------------------------------------------------------------------------------------------
 To answer the first question “What are the best-selling and the second best-selling products in every category?”, we need to rank products in a category based on their revenue, and to pick the best selling and the second best-selling products based the ranking. Below is the SQL query used to answer this question by using window function dense_rank (we will explain the syntax of using window functions in next section).
 SELECT
   product,
@@ -26,5 +26,17 @@ FROM (
 WHERE
   rank <= 2
   
- What is the difference between the revenue of each product and the revenue of the best-selling product in the same category of that product?
- 
+What is the difference between the revenue of each product and the revenue of the best-selling product in the same category of that product?
+--------------------------------------------------------------------------------------------------------------------------
+SELECT * FROM (
+SELECT deptno, ename, sal
+,dense_rank() over(partition by deptno order by sal DESC) rankNO
+, FIRST_VALUE(sal)
+         OVER (PARTITION BY DEPTNO ORDER BY sal DESC ROWS UNBOUNDED PRECEDING ) AS rr
+,(sal - FIRST_VALUE(sal) OVER(partition by deptno order by sal DESC )) AS DiffFromMax
+   FROM emp
+   WHERE 1=1
+   ) XX
+   WHERE XX.rankNO <=2
+   order by XX.deptno,XX.ename
+;
