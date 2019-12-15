@@ -58,3 +58,60 @@ dataFrame.select(
   dataFrame['category'],
   dataFrame['revenue'],
   revenue_difference.alias("revenue_difference"))
+  
+  The result of this program is shown below. Without using window functions, users have to find all highest revenue values of all categories and then join this derived data set with the original productRevenue table to calculate the revenue differences.
+  
+  Using Window Functions
+  =======================
+Spark SQL supports three kinds of window functions: ranking functions, analytic functions, and aggregate functions. The available ranking functions and analytic functions are summarized in the table below. For aggregate functions, users can use any existing aggregate function as a window function.
+
+
+Ranking functions
+=================
+SQl
+-------
+rank,dense_rank,percent_rank,ntile,row_number
+
+API
+--------
+rank,denseRank,percentRank,ntile,rowNumber
+
+
+Analytic functions
+=================
+SQl
+-------
+cume_dist,first_value,last_value,lag,lead
+
+API
+--------
+cumDist,firstValue,lastValue,lag,lead
+
+To use window functions, users need to mark that a function is used as a window function by either
+====================================================================================================
+Adding an OVER clause after a supported function in SQL, e.g. avg(revenue) OVER (...); or
+Calling the over method on a supported function in the DataFrame API, e.g. rank().over(...).
+Once a function is marked as a window function, the next key step is to define the Window Specification associated with this function. A window specification defines which rows are included in the frame associated with a given input row. A window specification includes three parts:
+1. Partitioning Specification: controls which rows will be in the same partition with the given row. Also, the user might want to make sure all rows having the same value for  the category column are collected to the same machine before ordering and calculating the frame.  If no partitioning specification is given, then all data must be collected to a single machine.
+2. Ordering Specification: controls the way that rows in a partition are ordered, determining the position of the given row in its partition.
+3. Frame Specification: states which rows will be included in the frame for the current input row, based on their relative position to the current row.  For example, “the three rows preceding the current row to the current row” describes a frame including the current input row and three rows appearing before the current row.
+
+-----------------------------------------------------------------
+In SQL, the PARTITION BY and ORDER BY keywords are used to specify partitioning expressions for the partitioning specification, and ordering expressions for the ordering specification, respectively. The SQL syntax is shown below.
+
+OVER (PARTITION BY ... ORDER BY ...)
+
+-----------------------------------------------------------------
+In the DataFrame API, we provide utility functions to define a window specification. Taking Python as an example, users can specify partitioning expressions and ordering expressions as follows.
+
+from pyspark.sql.window import Window
+windowSpec = \
+  Window \
+    .partitionBy(...) \
+    .orderBy(...)
+    
+---------------------------------
+In addition to the ordering and partitioning, users need to define the start boundary of the frame, the end boundary of the frame, and the type of the frame, which are three components of a frame specification.
+
+There are five types of boundaries, which are UNBOUNDED PRECEDING, UNBOUNDED FOLLOWING, CURRENT ROW, <value> PRECEDING, and <value> FOLLOWING. UNBOUNDED PRECEDING and UNBOUNDED FOLLOWING represent the first row of the partition and the last row of the partition, respectively. For the other three types of boundaries, they specify the offset from the position of the current input row and their specific meanings are defined based on the type of the frame. There are two types of frames, ROW frame and RANGE frame.
+
