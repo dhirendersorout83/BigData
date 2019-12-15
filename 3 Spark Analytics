@@ -237,3 +237,4 @@ object WindowGroupbyFirst extends App {
       .where(col("row")===1).select("department","avg","sum","min","max")
       .show()
 }
+
