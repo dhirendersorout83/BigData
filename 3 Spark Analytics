@@ -1,0 +1,30 @@
+What are Window Functions?
+Before 1.4, there were two kinds of functions supported by Spark SQL that could be used to calculate a single return value. Built-in functions or UDFs, such as substr or round, take values from a single row as input, and they generate a single return value for every input row. Aggregate functions, such as SUM or MAX, operate on a group of rows and calculate a single return value for every group.
+
+While these are both very useful in practice, there is still a wide range of operations that cannot be expressed using these types of functions alone. Specifically, there was no way to both operate on a group of rows while still returning a single value for every input row. This limitation makes it hard to conduct various data processing tasks like calculating a moving average, calculating a cumulative sum, or accessing the values of a row appearing before the current row. Fortunately for users of Spark SQL, window functions fill this gap.
+
+At its core, a window function calculates a return value for every input row of a table based on a group of rows, called the Frame. Every input row can have a unique frame associated with it. This characteristic of window functions makes them more powerful than other functions and allows users to express various data processing tasks that are hard (if not impossible) to be expressed without window functions in a concise way. Now, let’s take a look at two examples.
+
+Suppose that we have a productRevenue table as shown below.
+product,category,revenue
+
+We want to answer two questions:
+What are the best-selling and the second best-selling products in every category?
+
+To answer the first question “What are the best-selling and the second best-selling products in every category?”, we need to rank products in a category based on their revenue, and to pick the best selling and the second best-selling products based the ranking. Below is the SQL query used to answer this question by using window function dense_rank (we will explain the syntax of using window functions in next section).
+SELECT
+  product,
+  category,
+  revenue
+FROM (
+  SELECT
+    product,
+    category,
+    revenue,
+    dense_rank() OVER (PARTITION BY category ORDER BY revenue DESC) as rank
+  FROM productRevenue) tmp
+WHERE
+  rank <= 2
+  
+ What is the difference between the revenue of each product and the revenue of the best-selling product in the same category of that product?
+ 
