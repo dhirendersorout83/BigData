@@ -40,3 +40,21 @@ SELECT deptno, ename, sal
    WHERE XX.rankNO <=2
    order by XX.deptno,XX.ename
 ;
+
+For the second question “What is the difference between the revenue of each product and the revenue of the best selling product in the same category as that product?”, to calculate the revenue difference for a product, we need to find the highest revenue value from products in the same category for each product. Below is a Python DataFrame program used to answer this question.
+import sys
+from pyspark.sql.window import Window
+import pyspark.sql.functions as func
+windowSpec = \
+  Window 
+    .partitionBy(df['category']) \
+    .orderBy(df['revenue'].desc()) \
+    .rangeBetween(-sys.maxsize, sys.maxsize)
+dataFrame = sqlContext.table("productRevenue")
+revenue_difference = \
+  (func.max(dataFrame['revenue']).over(windowSpec) - dataFrame['revenue'])
+dataFrame.select(
+  dataFrame['product'],
+  dataFrame['category'],
+  dataFrame['revenue'],
+  revenue_difference.alias("revenue_difference"))
