@@ -1,4 +1,5 @@
 What are Window Functions?
+=========================================
 Before 1.4, there were two kinds of functions supported by Spark SQL that could be used to calculate a single return value. Built-in functions or UDFs, such as substr or round, take values from a single row as input, and they generate a single return value for every input row. Aggregate functions, such as SUM or MAX, operate on a group of rows and calculate a single return value for every group.
 
 While these are both very useful in practice, there is still a wide range of operations that cannot be expressed using these types of functions alone. Specifically, there was no way to both operate on a group of rows while still returning a single value for every input row. This limitation makes it hard to conduct various data processing tasks like calculating a moving average, calculating a cumulative sum, or accessing the values of a row appearing before the current row. Fortunately for users of Spark SQL, window functions fill this gap.
@@ -145,3 +146,94 @@ windowSpec.rowsBetween(start, end)
 # Defines a Window Specification with a RANGE frame.
 windowSpec.rangeBetween(start, end)
 
+
+
+
+
+
+=====================================================================================
+
+
+
+
+How to select the first row of each group? 
+-------------------------------------------
+We can select the first row from the group using SQL or DataFrame API, in this section, we will see with DataFrame API using a window function row_rumber and partitionBy.
+
+val w2 = Window.partitionBy("department").orderBy(col("salary"))
+    df.withColumn("row",row_number.over(w2))
+      .where($"row" === 1).drop("row")
+      .show()
+
+Retrieve Employee who earns the highest salary
+---------------------------------------------------
+val w3 = Window.partitionBy("department").orderBy(col("salary").desc)
+    df.withColumn("row",row_number.over(w3))
+      .where($"row" === 1).drop("row")
+      .show()
+      
+Select the Highest, Lowest, Average and Total salary for each department group
+------------------------------------------------------------------
+val w4 = Window.partitionBy("department")
+    val aggDF = df.withColumn("row",row_number.over(w3))
+      .withColumn("avg", avg(col("salary")).over(w4))
+      .withColumn("sum", sum(col("salary")).over(w4))
+      .withColumn("min", min(col("salary")).over(w4))
+      .withColumn("max", max(col("salary")).over(w4))
+      .where(col("row")===1).select("department","avg","sum","min","max")
+      .show()
+      
+Complete program for reference
+-------------------------------
+package com.sparkbyexamples.spark.dataframe.functions
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions._
+
+
+object WindowGroupbyFirst extends App {
+
+    val spark: SparkSession = SparkSession.builder()
+      .master("local[1]")
+      .appName("SparkByExamples.com")
+      .getOrCreate()
+
+    spark.sparkContext.setLogLevel("ERROR")
+
+    import spark.implicits._
+
+    val simpleData = Seq(("James","Sales",3000),
+      ("Michael","Sales",4600),
+      ("Robert","Sales",4100),
+      ("Maria","Finance",3000),
+      ("Raman","Finance",3000),
+      ("Scott","Finance",3300),
+      ("Jen","Finance",3900),
+      ("Jeff","Marketing",3000),
+      ("Kumar","Marketing",2000)
+    )
+    val df = simpleData.toDF("employee_name","department","salary")
+    df.show()
+
+    //Get the first row from a group.
+    val w2 = Window.partitionBy("department").orderBy(col("salary"))
+    df.withColumn("row",row_number.over(w2))
+      .where($"row" === 1).drop("row")
+      .show()
+
+     //Retrieve Highest salary
+    val w3 = Window.partitionBy("department").orderBy(col("salary").desc)
+    df.withColumn("row",row_number.over(w3))
+      .where($"row" === 1).drop("row")
+      .show()
+
+    //Maximum, Minimum, Average, total salary for each window group
+    val w4 = Window.partitionBy("department")
+    val aggDF = df.withColumn("row",row_number.over(w3))
+      .withColumn("avg", avg(col("salary")).over(w4))
+      .withColumn("sum", sum(col("salary")).over(w4))
+      .withColumn("min", min(col("salary")).over(w4))
+      .withColumn("max", max(col("salary")).over(w4))
+      .where(col("row")===1).select("department","avg","sum","min","max")
+      .show()
+}
