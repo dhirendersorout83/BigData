@@ -1,1 +1,2 @@
-https://databricks.com/blog/2015/07/15/introducing-window-functions-in-spark-sql.html
+1. https://databricks.com/blog/2015/07/15/introducing-window-functions-in-spark-sql.html
+2. USE BROADCAST in spark
