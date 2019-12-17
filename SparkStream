@@ -1,0 +1,11 @@
+Stream Processing Technic:
+
+Tuple at-a-time processing: This processing is also referred to as ‘tuple at-a-time processing’. In tuple at-a-time processing, data flows in the form a stream, where a stream is an unordered sequence of various tuples. Each event generates specific data that is represented as a tuple and is moved across systems as a stream of data. In such type of processing, the events are handled instantly as the tuples arrive.
+
+ 
+
+Micro-batch processing: This is very similar to batch processing, except for the fact that the batch is tiny. In micro-batch processing, the batch size generally depends on a few events gathered over a short time span, say a few milliseconds. Micro batches can also be considered a set of tuples grouped to form one micro set.
+Generally, we use tuple at-a-time processing when we want the results extremely fast. Micro-batch processing trades off high latency for a low cost.
+
+SparkStorm follow tuple processing
+SparkStream follow micro batch processing
