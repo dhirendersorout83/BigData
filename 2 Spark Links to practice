@@ -1,2 +1,16 @@
 1. https://databricks.com/blog/2015/07/15/introducing-window-functions-in-spark-sql.html
 2. USE BROADCAST in spark
+3. How reduce a dataframe with many couple columns in a single couple columns?
+
+val df = List((20,2,48,6,6,78), (40,78,47,74,69,6))
+    .toDF("house_score", "house_count", "mobile_score", "mobile_count", "sport_score", "sport_count")
+
+df.show
+
+val result = df
+    .flatMap(r => Range(0, 5, 2).map(i => (r.getInt(i), r.getInt(i + 1))))
+    .toDF("score", "count")
+
+result.show
+
+4. 
