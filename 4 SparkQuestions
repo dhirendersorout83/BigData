@@ -1,4 +1,5 @@
-What is difference between reduce and reduceByKey
+Q. What is difference between reduce and reduceByKey
+=====================================================
 Ans. 
 Reduce :
 is for aggregation of built-in datatypes for sum,multi which is commutative and associative 
@@ -9,3 +10,14 @@ ReduceByKey: works on key and value.
 can apply on complex data structure
 is one value for each key. And since this action can be run on each machine locally first then it can remain an RDD and have further transformations done on its dataset.
 Merge the values for each key using an associative and commutative reduce function
+
+
+
+Q. Converting a Spark Dataframe to a Scala Map collection
+=====================================================
+https://stackoverflow.com/questions/36895396/converting-a-spark-dataframe-to-a-scala-map-collection/36896210#36896210
+https://sparkbyexamples.com/spark/spark-sql-map-functions/
+
+
+Q. How to control driver and executor variable
+=====================================================================
