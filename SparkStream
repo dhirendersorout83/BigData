@@ -9,3 +9,7 @@ Generally, we use tuple at-a-time processing when we want the results extremely 
 
 SparkStorm follow tuple processing
 SparkStream follow micro batch processing
+
+
+Characteristics of Real-Time Stream Processing
+==================================================
