@@ -17,6 +17,7 @@ Q. Converting a Spark Dataframe to a Scala Map collection
 =====================================================
 https://stackoverflow.com/questions/36895396/converting-a-spark-dataframe-to-a-scala-map-collection/36896210#36896210
 https://sparkbyexamples.com/spark/spark-sql-map-functions/
+https://sparkbyexamples.com/spark/using-lit-and-typedlit-to-add-a-literal-or-constant-to-spark-dataframe/
 
 
 Q. How to control driver and executor variable
