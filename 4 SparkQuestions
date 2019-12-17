@@ -1,0 +1,11 @@
+What is difference between reduce and reduceByKey
+Ans. 
+Reduce :
+is for aggregation of built-in datatypes for sum,multi which is commutative and associative 
+Can not apply on complex data structure
+reduce must pull the entire dataset down into a single location because it is reducing to one final value.
+
+ReduceByKey: works on key and value. 
+can apply on complex data structure
+is one value for each key. And since this action can be run on each machine locally first then it can remain an RDD and have further transformations done on its dataset.
+Merge the values for each key using an associative and commutative reduce function
