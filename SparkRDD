@@ -39,3 +39,49 @@ In the above code "in/u.data" is the relative address of the file "u.data".
 
 Paired RDDs are created by transforming a basic RDD to pairedRDD using various transformation operations such as mapToPair and flatMapToPair. You will learn these operations in detail in the upcoming sessions.
 
+b. In Scala language
+========================
+As similar to the previous example here also we need to return tuples. Furthermore, this will make available the functions of keyed data. Also, to offer the extra key or value functions, an implicit conversion on Spark RDD of tuples exists.
+
+Transformation Operations
+-------------------------
+groupByKey
+The groupbykey operation generally groups all the values with the same key.
+rdd.groupByKey()
+
+reduceByKey(fun)
+Here, the reduceByKey operation generally combines values with the same key.
+add.reduceByKey( (x, y) => x + y)
+
+mapValues(func)
+Even without changing the key, mapValues operation applies a function to each value of a paired RDD of spark.
+rdd.mapValues(x => x+1)
+
+keys()
+Keys() operation generally returns a spark RDD of just the keys.
+rdd.keys()
+
+values()
+values() operation generally returns an RDD of just the values.
+rdd.values()
+
+sortByKey()
+Similarly, the sortByKey operation generally returns an RDD sorted by the key.
+rdd.sortByKey()
+
+Action Operations
+==================
+As similar as RDD transformations, there are same RDD actions available on spark pair RDD. However, paired RDDs also attains some additional actions of spark. Basically, those leverages the advantage of data which is of keyvalue nature. Let’s discuss some of the action methods below, like
+
+countByKey()
+Through countByKey operation, we can count the number of elements for each key.
+rdd.countByKey()
+
+collectAsMap()
+Here, collectAsMap() operation helps to collect the result as a map to provide easy lookup.
+rdd.collectAsMap()
+
+lookup(key)
+Moreover, it returns all values associated with the provided key.
+rdd.lookup()
+
