@@ -45,3 +45,32 @@ The repartition method can be used to increase the number of partitions as well.
 val bartDf = numbersDf.repartition(6)
 bartDf.rdd.partitions.size // => 6
 
+Real World Example
+--------------------
+Suppose you have a data lake that contains 2 billion rows of data (1TB) split in 13,000 partitions.
+You’d like to create a data puddle that’s a random sampling of one millionth of the data lake. The data puddle will be used in development and the data lake will be reserved for production grade code. You’d like to write the data puddle out to S3 for easy access.
+Here’s how you’d structure the code:
+
+val dataPuddle = dataLake.sample(true, 0.000001)
+dataPuddle.write.parquet("s3a://my_bucket/puddle/")
+
+Spark doesn’t adjust the number of partitions when a large DataFrame is filtered, so the dataPuddle will also have 13,000 partitions. The dataPuddle only contains 2,000 rows of data, so a lot of the partitions will be empty. It’s not efficient to read or write thousands of empty text files to S3 — we should improve this code by repartitioning.
+
+val dataPuddle = dataLake.sample(true, 0.000001)
+val goodPuddle = dataPuddle.repartition(4)
+goodPuddle.write.parquet("s3a://my_bucket/puddle/")
+
+Why did we choose 4 partitions for the data puddle?
+------------------------------------------------------------
+The data is a million times smaller, so we reduce the number of partitions by a million and keep the same amount of data per partition. 13,000 partitions / 1,000,000 = 1 partition (rounded up). We used 4 partitions so the data puddle can leverage the parallelism of Spark.
+In general, you can determine the number of partitions by multiplying the number of CPUs in the cluster by 2, 3, or 4 (see more here and here).
+number_of_partitions = number_of_cpus * 4
+
+If you’re writing the data out to a file system, you can choose a partition size that will create reasonable sized files (100MB). Spark will optimize the number of partitions based on the number of clusters when the data is read.
+
+Why did we use the repartition method instead of coalesce?
+---------------------------------------------------------------
+A full data shuffle is an expensive operation for large data sets, but our data puddle is only 2,000 rows. The repartition method returns equal sized text files, which are more efficient for downstream consumers.
+Actual performance improvement
+It took 241 seconds to count the rows in the data puddle when the data wasn’t repartitioned (on a 5 node cluster). It only took 2 seconds to count the data puddle when the data was partitioned — that’s a 124x speed improvement!
+
