@@ -24,3 +24,5 @@ Image
 
 Image
  spark.dynamicAllocation.enabled, spark.shuffle.service.enabled—Used together to modify the default scheduling behavior in Spark. (I will come back to these shortly when I discuss dynamic allocation.)
+
+You can set partition in your spark sql code by setting the property as: spark.sql.shuffle.partitions
