@@ -22,3 +22,26 @@ https://sparkbyexamples.com/spark/using-lit-and-typedlit-to-add-a-literal-or-con
 
 Q. How to control driver and executor variable
 =====================================================================
+
+
+Q. What is difference between Coalesce and repartition?
+==============================================================
+https://medium.com/@mrpowers/managing-spark-partitions-with-coalesce-and-repartition-4050c57ad5c4
+
+coalesce
+-----------
+The coalesce algorithm moved the data from Partition B to Partition A and moved the data from Partition D to Partition C. The data in Partition A and Partition C does not move with the coalesce algorithm. This algorithm is fast in certain situations because it minimizes data movement.
+
+You can try to increase the number of partitions with coalesce, but it won’t work!
+val numbersDf3 = numbersDf.coalesce(6)
+numbersDf3.rdd.partitions.size // => 4
+
+repartition
+--------------
+The repartition method can be used to either increase or decrease the number of partitions in a DataFrame.
+Partition ABC contains data from Partition A, Partition B, Partition C, and Partition D. Partition XYZ also contains data from each original partition. The repartition algorithm does a full data shuffle and equally distributes the data among the partitions. It does not attempt to minimize data movement like the coalesce algorithm.
+
+The repartition method can be used to increase the number of partitions as well.
+val bartDf = numbersDf.repartition(6)
+bartDf.rdd.partitions.size // => 6
+
