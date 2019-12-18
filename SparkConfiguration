@@ -1,0 +1,26 @@
+Spark Configuration
+Spark configuration parameters are typically set on a node (such as a master or worker node) or an application (by the driver host submitting the application). They often have a more restricted scope (such as for the life of an application) than their equivalent environment variables, and take higher precedence than these.
+
+There are numerous Spark configuration properties related to many different operational aspects; I will cover some of the most common properties now.
+
+Image
+ spark.master—Address of the Spark master (such as, for example, spark://master:7077 for a standalone cluster). If the value is yarn, then the Hadoop configuration files will be read to locate the YARN ResourceManager (there is no default value for this property).
+
+Image
+ spark.driver.memory—Configures the amount of memory allocated to the driver (defaults to 1 GB).
+
+
+Image
+ spark.executor.memory—Configures the amount of memory to use per executor process (defaults to 1 GB).
+
+Image
+ spark.executor.cores—Configures the number of cores to use on each executor. In standalone mode, this property defaults to using all available cores on the worker node. Setting this property to a value less than the available number of cores enables multiple concurrent executor processes to be spawned. In YARN mode, this property defaults to 1 (core per executor).
+
+Image
+ spark.driver.extraJavaOptions, spark.executor.extraJavaOptions—Additional Java opts supplied to the JVM hosting the Spark driver or executor processes. If this is used, the value should be in the standard form, -Dx=y.
+
+Image
+ spark.driver.extraClassPath, spark.executor.extraClassPath—Additional classpath entries for the driver and executor processes if you require additional classes to be imported that are not packaged with Spark.
+
+Image
+ spark.dynamicAllocation.enabled, spark.shuffle.service.enabled—Used together to modify the default scheduling behavior in Spark. (I will come back to these shortly when I discuss dynamic allocation.)
