@@ -1,8 +1,11 @@
 1. https://databricks.com/blog/2015/07/15/introducing-window-functions-in-spark-sql.html
+============================================================================================
+
 2. USE BROADCAST in spark
 /* to broad cast data must be at driver. when we read file as rdd this is distributed and 
   * to broad cast, complete rdd must be available at driver. to do that use collect() menthod to move complete
    * data at driver machine */
+
 3. How reduce a dataframe with many couple columns in a single couple columns?
 
 val df = List((20,2,48,6,6,78), (40,78,47,74,69,6))
@@ -16,4 +19,4 @@ val result = df
 
 result.show
 
-4. 
+4. DataFrameReader example in scala
