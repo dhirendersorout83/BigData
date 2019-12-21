@@ -39,3 +39,7 @@ b) Try to access dataset[Class] column with column Name
 
 c) Try to access dataset[Row]=DataFrame column with index
 d) Try to access dataset[Row]=DataFrame column with column Name
+e) Convert case class to schema StructType
+  Code :    val encoderSchema = Encoders.product[RecType].schema
+  
+  
