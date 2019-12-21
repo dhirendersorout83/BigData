@@ -36,10 +36,13 @@ Read json with schema succefully but csv is giving error
 
 a) Try to access dataset[Class] column with index
 b) Try to access dataset[Class] column with column Name
-
+for dataframe
 c) Try to access dataset[Row]=DataFrame column with index
 d) Try to access dataset[Row]=DataFrame column with column Name
 e) Convert case class to schema StructType
   Code :    val encoderSchema = Encoders.product[RecType].schema
   
   
+7. 
+============================================================================================
+https://stackoverflow.com/questions/27781020/read-csv-in-scala-into-case-class-instances-with-error-handling
