@@ -9,6 +9,7 @@
 
 3. How reduce a dataframe with many couple columns in a single couple columns?
 ============================================================================================
+a)
 
 val df = List((20,2,48,6,6,78), (40,78,47,74,69,6))
     .toDF("house_score", "house_count", "mobile_score", "mobile_count", "sport_score", "sport_count")
@@ -28,3 +29,13 @@ https://alvinhenrick.com/2017/05/16/apache-spark-analytical-window-functions/
 
 5. DataFrameReader example : Scala Spark
 ============================================================================================
+
+6. Read CSV as Dataset with schema
+============================================================================================
+Read json with schema succefully but csv is giving error
+
+a) Try to access dataset[Class] column with index
+b) Try to access dataset[Class] column with column Name
+
+c) Try to access dataset[Row]=DataFrame column with index
+d) Try to access dataset[Row]=DataFrame column with column Name
