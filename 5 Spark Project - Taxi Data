@@ -1,0 +1,140 @@
+https://github.com/AlvinMark/PGDDS-IIIT-Bangalore/edit/master/DDA1730308_NYCParkingTicket_CodeScript.R
+
+#The Data Dictionary for this dataset is as follows: [Field Name--Description]
+#[1] Summons_Number--Unique Identifier Of Summons [Primary Key]   
+#[2] Plate_Id--Registered Plate Id     
+#[3] Registration_State--State Of Plate Registration    
+#[4] Plate_Type--Type Of Plate     
+#[5] Issue_Date--Issue Date      
+#[6] Violation_Code--Type Of Violation     
+#[7] Summ_Veh_Body--Vehicle Body Type Written On Summons (Sedan, Etc.)
+#[8] Summ_Veh_Make--Make Of Car Written On Summons  
+#[9] Issuing_Agency--Issuing Agency Code     
+#[10] Street_Code1--Geographical Street Code     
+#[11] Street_Code2--Geographical Street Code     
+#[12] Street_Code3--Geographical Street Code     
+#[13] Vehicle_Expiration_Date--Vehicle Expiration Date On Summons   
+#[14] Violation_Location--General Violation Location     
+#[15] Violation_Precinct--Precinct Of Violation     
+#[16] Issuer_Precinct--Precinct Of Issuance     
+#[17] Issuer_Code--Unique Code Identifying Issuing Officer   
+#[18] Issuer_Command--Command Of Issuing Officer    
+#[19] Issuer_Squad--Issuing Officer'S Squad     
+#[20] Violation_Time--Time Violation Occurred     
+#[21] Time_First_Observed--Time Of Initial Violation Observation   
+#[22] Violation_County--County Of Violation     
+#[23] Front_Of_Opposite--Violation In Front Of Or Opposite  
+#[24] House_Number--Address Number Of Violation    
+#[25] Street_Name--Street Name Of Summons Issued   
+#[26] Intersecting_Street--Violation Near Intersecting Street    
+#[27] Date_First_Observed--Date Of Initial Violation Observation   
+#[28] Law_Section--Section Of Vehicle & Traffic Law  
+#[29] Sub_Division--Sub Division On Summons Image   
+#[30] Violation_Legal_Code--Type Of Legal Code    
+#[31] Days_In_Effect--Days Parking In Effect    
+#[32] From_Hours_In_Effect--Start Time Posted For Meter And Sign Violations
+#[33] To_Hours_In_Effect--End Time Posted For Meter And Sign Violations
+#[34] Vehicle_Color--Car Color Written On Summons   
+#[35] Unregistered_Vehicle?--Unregistered Vehicle Indicator     
+#[36] Vehicle_Year--Year Of Vehicle Written On Summons  
+#[37] Meter_Number--Parking Meter Number For Meter Violations  
+#[38] Feet_From--Number Of Feet From Curb For Hydrant Violation
+#[39] Violation_Post_Code--Location Post Code Of Violation   
+#[40] Violation_Description--Description Of Violation     
+#[41] No_Standing_Or_Stopping_Violation--Summons Indictor For No Standing Or Stopping 
+#[42] Hydrant_Violation--Summons Indicator For Hydrant Violation   
+#[43] Double_Parking_Violation--Summons Indicator For Double Parking Violation
+
+#The data for 2017 has been uploaded on an S3 bucket at the following link:
+"s3://hiveassignmentdatabde/Parking_Violations_Issued_-_Fiscal_Year_2017.csv"
+
+#Pre-Requisites for Analysis:
+#[1] Create a suitable S3 bucket. I created a bucket called amwparkingticketnyc and created a file rawdatafiles to store the initial Dataset.
+#[2] Upload the dataset into S3 using the AWS CLI: Create a cluster and access the master node through the CLI. Download the datasets into a suitable directory on the master using the [sudo wget <paste link>] command [Note: We had to use a Chrome Plugin called CurlWget to circumvent the permissions issue on Kaggle.com]. Then using the [sudo aws s3 cp <file name> <bucket name>] command transfer the dataset into the desired S3 bucket.
+
+#Methodology for Analysis: We will conduct the analysis in 3 stages.
+#Stage 1: Data Quality Verification and Cleaning
+#Stage 2: Overview and Examining the dataset
+#Stage 3: Deriving and Comparing Metrics through Aggregation Tasks.
+
+#1.2. Initializing the Spark session.
+
+#1.3. Importing the dataset files into specific dataframes
+
+#1.4. Fixing Column Names for the imported Datasets.
+#Since Column Names of the dataframes have spaces in between consecutive words it may lead to typos and coding issues. Therefore, we will eliminate all white spaces and seperate consecutive words with "_"
+
+#1.5. Understanding the dimensions and structure of the the Imported Dataset tkt_2015_nycparking
+
+#From the Schema and Datatypes of each column there are several non-conforming columns like Issue_Date, Vehicle_Expiration_Date, Violation Time, Date_First_Observed etc.
+#These columns need to be filtered and transformed into a suitable format for processing. We will explore any further discrepancies in the individual EDA.
+
+#From Sections 1.5.,1.6. and 1.7. it is clear that the dataframes have varying number of columns. As the columns "Latitude", "Longitude", "Community_Board", "Community_Council", "Census_Tract", "BIN", "BBL" and "NTA" are logged for the fiscal year 2015, 2016 but not for 2017. We will look into the feasibility of removing these columns during the detailed analysis.
+
+
+#************************#
+
+#1.8. Detailed Data Quality Verification of 2015 NYC Parking Ticket Dataset
+#1.8.1. Removing any duplicate rows in the dataset [Two or More rows having the same Summons_Number ]
+
+#1.8.2 Since ticket Issue Date is an critical parameter to assess the quality of the Dataset. Let us check if there are any missing values in the Issue Date Parameter.
+
+#There are no records with missing Issue Date or Null Issue Date
+
+#1.8.3.1 Converting the Date Paramters[Issue Date, Vehicle Expiration Date and Date First Observed] to a suitable format for Analysis.
+
+#1.8.3.2 Let's Understand the Range of ticket Issue Dates Available in the Dataset
+
+# Min_IssueDate_2015 : 1985-07-16
+# Max_IssueDate_2015 : 2015-06-30
+# The Issue Tickets range between 16th July 1985 to 30th June 2015. Clearly this is Nonconforming. Let us Analyze this parameter closely to decide optimal filter condition.
+
+#1.8.3.3 We Will create Additional Columns in the Dataset that Correspond to the Year and Month of Ticket Issue
+
+#Now let's observe the Distribution of Issue Date.
+
+createOrReplaceTempView(tkt_2015_nycparking, "tkt_2015_nyc")
+Grouped_Issue_Date_2015 <- SparkR::sql("SELECT Issue_Year,
+                                       Issue_Month,
+                                       count(*)as Num_of_Records
+                                       FROM tkt_2015_nyc
+                                       GROUP BY Issue_Year,
+                                       Issue_Month
+                                       ORDER BY 1,2")
+
+#Note:Run the Above Command Then Run the dfgrouped_issue_ym_2015 command
+
+#1.8.3.4 Subsetting the DataFrame according to the Fiscal Year [Read Assumptions For Justification]
+# Considering A Fiscal Year to extend from the July of Pervious Year to June of the Current Year.
+
+tkt_2015_nycparking <- tkt_2015_nycparking[
+  tkt_2015_nycparking$Issue_Date >= "2014-07-01" & 
+    tkt_2015_nycparking$Issue_Date <= "2015-06-30"]
+
+
+#1.8.4 The columns "Latitude", "Longitude", "Community_Board", "Community_Council", "Census_Tract", "BIN", "BBL" and "NTA" are logged for the fiscal year 2015 and 2016 but not for 2017. We will Check the Number of Null values in the aforementioned columns in tkt_2015_nycparking. 
+
+#Removing these Null Columns.
+
+#1.8.5 Fixing the format for the Violation Time [Time First Observed, From Hours in Effect and To Hours in Effect are also converted.]
+#We can observe that the string format of the time attributes include only a partial component of AM/PM. Therefore we will append M to the end of each time attribute before converting it into a timestamp.
+
+#Since we are conducting an Analysis with Violation Time we will look into this attribute a littl closer.
+#Extracting Violation Hour, Violation Minute and Part of Day.
+
+#We've observed that there are records that have both 00xxAM as well as 12xxAM. Therefore we will replace all 00xxAM with 12xxAM
+
+#Concatenating the components into a standardized Violation Time.
+
+#Converting Violation Time into a TimeStamp
+
+#1.8.6 The dimensions of Formatted and Cleaned Dataset that will be used for Analysis:
+
+#************************ Stage 2: Overview and Examining the dataset ************************#
+#Creating temp views of each table
+
+#************ Stage 2: Q1 ************#
+#2.1.1 Find total number of tickets for each year!
+
+
+
