@@ -1,0 +1,118 @@
+https://docs.databricks.com/data/data-sources/read-csv.html
+
+CSV Files
+December 20, 2019
+
+Supported options
+Read files
+path: location of files. Accepts standard Hadoop globbing expressions. To read a directory of CSV files, specify a directory.
+header: when set to true, the first line of files name columns and are not included in data. All types are assumed to be string. Default value is false.
+sep: the column delimiter. By default ,, but can be set to any character.
+quote: the quote character. By default ", but can be set to any character. Delimiters inside quotes are ignored.
+escape: the escape character. By default \, but can be set to any character. Escaped quote characters are ignored.
+parserLib: by default is commons. Can be set to univocity to use that library for CSV parsing.
+mode: the parsing mode. By default it is PERMISSIVE. Possible values are:
+PERMISSIVE: try to parse all lines: nulls are inserted for missing tokens and extra tokens are ignored.
+DROPMALFORMED: drop lines that have fewer or more tokens than expected or tokens which do not match the schema.
+FAILFAST: abort with a RuntimeException if any malformed line is encountered.
+charset: the character set. By default UTF-8, but can be set to other valid charset names.
+inferSchema: automatically infer column types. It requires one extra pass over the data and is false by default.
+comment: skip lines beginning with this character. Default is #. Disable comments by setting this to null.
+nullValue: string that indicates a null value, any fields matching this string will be set as nulls in the DataFrame.
+dateFormat: string that indicates the date format to use when reading dates or timestamps. Custom date formats follow the formats at java.text.SimpleDateFormat. This applies to both DateType and TimestampType. By default it is null, which means try to parse times and date by java.sql.Timestamp.valueOf() and java.sql.Date.valueOf().
+Write files
+The package also supports saving simple (non-nested) DataFrame. When writing files the API accepts the following options:
+
+path: location of files.
+header: when set to true, the header (from the schema in the DataFrame) is written at the first line.
+sep: the column delimiter. By default ,, but can be set to any character.
+quote: the quote character. By default ", but can be set to any character. This is written according to quoteMode.
+escape: the escape character. By default \, but can be set to any character. Escaped quote characters are written.
+nullValue: string that indicates a null value, nulls in the DataFrame will be written as this string.
+dateFormat: string that indicates the date format to use writing dates or timestamps. Custom date formats follow the formats at java.text.SimpleDateFormat. This applies to both DateType and TimestampType. If no dateFormat is specified, then yyyy-MM-dd HH:mm:ss.S.
+codec: compression codec to use when saving. Should be the fully qualified name of a class implementing org.apache.hadoop.io.compress.CompressionCodec or one of case-insensitive short names (bzip2, gzip, lz4, and snappy). Defaults to no compression.
+quoteMode: when to quote fields (ALL, MINIMAL (default), NON_NUMERIC, NONE), see Quote Modes.
+Examples
+These examples use the diamonds dataset available as a Databricks dataset. Specify the path to the dataset as well as any options that you would like.
+
+Read file in any language
+This notebook shows how to a read file, display sample data, and print the data schema using Scala, R, Python, and SQL.
+
+Read CSV files notebook
+val diamonds = spark.read.format("csv")
+  .option("header", "true")
+  .option("inferSchema", "true")
+  .load("/databricks-datasets/Rdatasets/data-001/csv/ggplot2/diamonds.csv")
+
+display(diamonds)
+
+=====================================================================
+Specify schema
+When the schema of the CSV file is known, you can specify the desired schema to the CSV reader with the schema option.
+
+Read CSV files with a specified schema notebook
+import org.apache.spark.sql.types._
+
+val schema = new StructType()
+  .add("_c0",IntegerType,true)
+  .add("carat",DoubleType,true)
+  .add("cut",StringType,true)
+  .add("color",StringType,true)
+  .add("clarity",StringType,true)
+  .add("depth",DoubleType,true)
+  .add("table",DoubleType,true)
+  .add("price",IntegerType,true)
+  .add("x",DoubleType,true)
+  .add("y",DoubleType,true)
+  .add("z",DoubleType,true)
+
+val diamonds_with_schema = spark.read.format("csv")
+  .option("header", "true")
+  .schema(schema)
+  .load("/databricks-datasets/Rdatasets/data-001/csv/ggplot2/diamonds.csv")
+  
+  Verify correctness of the data
+When reading CSV files with a specified schema, it is possible that the actual data in the files does not match the specified schema. For example, a field containing name of the city will not parse as an integer. The consequences depend on the mode that the parser runs in:
+
+PERMISSIVE (default): nulls are inserted for fields that could not be parsed correctly
+DROPMALFORMED: drops lines that contain fields that could not be parsed
+FAILFAST: aborts the reading if any malformed data is found
+
+val diamonds_with_wrong_schema_drop_malformed = sqlContext.read.format("csv").option("mode", "PERMISSIVE")
+
+=========================================================================================
+Pitfalls of reading a subset of columns
+The behavior of the CSV parser depends on the set of columns that are read. If the specified schema is incorrect, the results might differ considerably depending on the subset of columns that is accessed. The notebook below presents the most common pitfalls.
+
+Caveats of reading a subset of columns of a CSV file notebook
+import org.apache.spark.sql.types._
+
+val schema = new StructType()
+  .add("_c0",IntegerType,true)
+  .add("carat",DoubleType,true)
+  .add("cut",StringType,true)
+  .add("color",StringType,true)
+  .add("clarity",StringType,true)
+  .add("depth",IntegerType,true) // The depth field is defined wrongly. The actual data contains floating point numbers, while the schema specifies an integer.
+  .add("table",DoubleType,true)
+  .add("price",IntegerType,true)
+  .add("x",DoubleType,true)
+  .add("y",DoubleType,true)
+  .add("z",DoubleType,true)
+
+val diamonds_with_wrong_schema = spark.read.format("csv")
+  .option("header", "true")
+  .schema(schema)
+  .load("/databricks-datasets/Rdatasets/data-001/csv/ggplot2/diamonds.csv")
+// The mistake in the user-specified schema causes any row with a non-integer value in the depth column to be nullified.
+// There are some rows, where the value of depth is an integer e.g. 64.0. They are parsed and converted successfully.
+display(diamonds_with_wrong_schema)
+
+// Reading a subset of columns that does not include the problematic depth column avoids the issue.
+// There are no nullified rows.
+display(diamonds_with_wrong_schema.select($"_c0", $"carat", $"clarity"))
+
+// However as soon as the depth column is included, the parsing and coversion fails for many rows. 
+display(diamonds_with_wrong_schema.select($"_c0", $"carat", $"clarity", $"depth"))
+
+diamonds_with_wrong_schema.createOrReplaceTempView("diamonds_with_wrong_schema")
