@@ -1,0 +1,23 @@
+Q: Difference Between Apache Kafka and Flume
+Apache Kafka
+------------
+is an open source system for processing ingests data in real-time. Kafka is the durable, scalable and fault-tolerant public-subscribe messaging system. The publish-subscribe architecture was initially developed by LinkedIn to overcome the limitations in batch processing of large data and to resolve issues on data loss. The architecture in Kafka will disassociate the information provider from the consumer of information. Hence, the sending application and the receiving application will not know anything about each other for that data sent and received.
+
+Apache Kafka will process incoming data streams irrespective of their source and its destination. It is a distributed streaming platform with capabilities similar to an enterprise messaging system but has unique capabilities with high levels of sophistication.  With Kafka, users can publish and subscribe to information as and when they occur. It allows users to store data streams in a fault-tolerant manner. Irrespective of the application or use case, Kafka easily factors massive data streams for analysis in enterprise Apache Hadoop. Kafka also can render streaming data through a combination of Apache HBase, Apache Storm, and Apache Spark systems and can be used in a variety of application domains.
+In simplistic terms, Kafka’s publish-subscribe system is made up of publishers, Kafka cluster, and consumers/subscribers. Data published by the publisher are stored as logs. Subscribers can also act as publishers and vice-versa. A subscriber requests for a subscription and Kafka forwards the data to the requested subscriber. Typically, there can be numerous publishers and subscribers on different topics on a Kafka cluster. Likewise, an application can act as both, a publisher and subscriber. A message published for a topic can have multiple interested subscribers; the system processes data for every interested subscriber. Some of the use cases where Kafka is widely used are:
+
+Track activities on a website
+Stream processing
+Collecting and monitoring metrics
+Log Aggregation
+
+Apache Flume
+------------
+is a tool which is used to collect, aggregate and transfer data streams from different sources to a centralized data store such as HDFS (Hadoop Distributed File System). Flume is highly reliable, configurable and manageable distributed data collection service which is designed to gather streaming data from different web servers to HDFS. It is also an open source data collection service.
+
+Apache Flume is based on streaming data flows and has a flexible architecture. Flume offers highly fault-tolerant, robust and reliable mechanism for fail-over and recovery with the capability to collect data in both batch and in stream modes. Flume’s capabilities are leveraged by enterprises to manage high volume streams of data to land in HDFS. For instance, data streams include application logs, sensors and machine data and social media, and so on.  These data, when landed in Hadoop, can be analyzed by running interactive queries in Apache Hive or serve as real-time data for business dashboards in Apache HBase. Some of the features include,
+
+Gather data from multiple sources, and efficiently ingest into HDFS
+A variety of source and destination types are supported
+Flume can be easily customized, reliable, scalable and fault-tolerant
+Can store data in any centralized store (eg., HDFS, HBase)
