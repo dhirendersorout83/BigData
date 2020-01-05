@@ -1,0 +1,18 @@
+Connect to ec2 instance.
+start the zookeeper:
+>cd douwnload/zookeeper_verisons
+>bin/zkServer.sh start
+check zookeeper status
+>ps -eaf | grep -i zoo
+
+Now start the kafka cluster
+>cd download/kafka_folder
+>bin/kafka-server-start.sh config/server.properties
+check existing topic:
+>sudo -s
+>bin/kafka-topics.sh --list --zookeeper localhost:2181
+
+create topic:
+>bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partition 1 --topic upgrad-kafka-topic
+
+Note: if ther is one broker and topic create with replication factor more than 1 , topic will give error
