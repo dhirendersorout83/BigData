@@ -1,0 +1,28 @@
+Zookeeper Cluster: is cordinator who store the meta data and keeps the track of kafka cluster. prod env must have three or more machines
+node1 is leader and others would be peers. defualt port 2181
+
+register every node of zookeeper cluster with each mochine in kafka cluster. each node in kafka cluster is also called broker
+
+Next step in kafka in any organization is at the application level.
+Application development:
+1. create topic: 
+create topic for twitter and all the message would store in this topic. avery topic replicates to each node.
+
+another terminology as architecture provide partitioning data. let say, topic has three partion p1,p2,p3 and sanme partition will be available on all machine
+now, kafka cluster ready to be consumes.
+default port 9092 for kafka cluster
+
+Similarly, the stream of data gets divided across multiple topics as well. Every message has a non-changeable unique id called an offset.
+In the image shown above, there are three partitions in a topic. They are Partition 0, Partition 1 and Partition 2. Each of these partitions contains some message, and each of those messages has a unique, immutable numeric id called offset. So, Partition 0 contains 12 messages, Partition 1 contains 9 messages, and Partition 2 contains 12 messages.
+
+As you have learnt, a producer writes messages to a topic partition. So whenever a message goes into a topic partition, it is automatically assigned an offset value by Kafka.
+
+Similarly, when a consumer reads/consumes a message it essentially is reading the offset value of that message in a topic partition, as shown below.
+
+NOw we have a rady kafka queue and some application push message to queue. this application is call nothing but publisher/producer.
+application can written in any languages. kafka provide libraries for different languages.
+
+source syste(twiter) -> publisher/producers(application)(client system),app provide topic/partion no/ details to kafka cluster ->  kafka cluster
+
+
+Kafka consumer/subscriber : can have multiple application which consume data. consume data for topic/partition no
