@@ -41,6 +41,8 @@ Consumer
 Properties props = new Properties();
 props.put("bootstrap.servers", "18.235.250.70:9092");
 props.put("group.id", "test");
+props.put("acks", "all");
+props.put("retries", 0);
 props.put("enable.auto.commit", "true");
 props.put(“auto.offset.reset”, “earliest”);
 props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
