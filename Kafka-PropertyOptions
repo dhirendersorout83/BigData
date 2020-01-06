@@ -1,0 +1,25 @@
+Required configuration parameters
+-------------------------------------
+//An identifier for the stream processing application. Must be unique within the Kafka cluster.
+application.id
+
+This ID is used in the following places to isolate resources used by the application from others:
+
+As the default Kafka consumer and producer client.id prefix
+As the Kafka consumer group.id for coordination
+As the name of the subdirectory in the state directory (cf. state.dir)
+As the prefix of internal Kafka topic names
+Tip:When an application is updated, the application.id should be changed unless you want to reuse the existing data in internal topics and state stores. For example, you could embed the version information within application.id, as my-app-v1.0.0 and my-app-v1.0.2.
+
+
+//A list of host/port pairs to use for establishing the initial connection to the Kafka cluster.
+bootstrap.servers
+
+Optional configuration parameters
+--------------------------------------
+Here are the optional Streams javadocs, sorted by level of importance:
+
+High: These parameters can have a significant impact on performance. Take care when deciding the values of these parameters.
+Medium: These parameters can have some impact on performance. Your specific environment will determine how much tuning effort should be focused on these parameters.
+Low: These parameters have a less general or less significant impact on performance.
+
