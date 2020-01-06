@@ -14,7 +14,7 @@ pom.xml
 <scope>test</scope>
 </dependency>
 
-
+-- producer properties
 properties.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 properties.setProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
 properties.setProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
@@ -34,8 +34,18 @@ producer.send(new ProducerReocrd<String,String>("my-topic",Integer.toString(i),I
 
 producer.close();
 
-
-
+-- consumer properties
+properties.setProperty(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+properties.setProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+properties.setProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+properties.setProperty(ConsumerConfig.GROUP_ID_CONFIG, "test-group");
+properties.setProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+or
+properties.put("bootstrap.servers", "localhost:9092");
+properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+properties.put("group.id", "test-group");
+properties.put("auto.offset.reset", "earliest");
 Consumer 
 ==========================
 Properties props = new Properties();
