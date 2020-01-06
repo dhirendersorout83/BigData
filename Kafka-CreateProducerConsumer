@@ -1,0 +1,64 @@
+pom.xml
+--------
+<!-- https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients -->
+<dependency>
+<groupId>org.apache.kafka</groupId>
+<artifactId>kafka-clients</artifactId>
+<version>2.0.0</version>
+</dependency>
+<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+<dependency>
+<groupId>org.slf4j</groupId>
+<artifactId>slf4j-simple</artifactId>
+<version>1.7.25</version>
+<scope>test</scope>
+</dependency>
+
+Producer.java
+------------
+Properties props = new Properties();
+props.put("bootstrap.servers","localhost:9092")
+props.put("key.serializer","org.apache.kafka.common.serialization.StringSerializer")
+props.put("value.serializer","org.apache.kafka.common.serialization.StringSerializer")
+
+
+Producer<String,String> producer = new KafkaProducer<String,String>(props)
+for loop
+producer.send(new ProducerReocrd<String,String>("my-topic",Integer.toString(i),Integer.toString(i)) )
+
+producer.close();
+
+
+
+Consumer 
+==========================
+Properties props = new Properties();
+props.put("bootstrap.servers", "18.235.250.70:9092");
+props.put("group.id", "test");
+props.put("enable.auto.commit", "true");
+props.put(“auto.offset.reset”, “earliest”);
+props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
+//a Kafka consumer will get created with the user-defined properties
+KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
+
+
+//the consumer will read messages from a list of topics. In
+//this case, the consumer is reading only from one topic called my-topic
+consumer.subscribe(Arrays.asList("my-topic"));
+
+//Let’s say there are two more topics, say, kafka-topic-1 and kafka-topic-2. If you want your
+//consumer to read from these two topics as well then modify the code snippet as
+consumer.subscribe(Arrays.asList("my-topic", “kafka-topic-1”, “kafka-topic-2”));
+
+//Read message
+while (true) {
+ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
+for (ConsumerRecord<String, String> record : records) {
+System.out.printf("offset = %d, key = %s, value = %s", record.offset(), record.key(),
+record.value());
+}
+
+
+}
