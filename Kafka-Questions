@@ -16,3 +16,22 @@ Stateful transformation such as aggregation, join, window etc.
 Planning to use local state store or mounted store such as Portworx etc.
 Achieve Exactly one processing semantic and auto defined fault tolerance.
 
+Q. How to change kafka retention period
+bin/kafka-topics.sh --zookeeper zk.yoursite.com --alter --topic as-access --config retention.ms=86400000
+
+//You can check whether the configuration is properly applied with the following command.
+bin/kafka-topics.sh --describe --zookeeper zk.yoursite.com --topic as-access
+
+//The following is the right way to alter topic config as of Kafka 0.10.2.0 as Topic config alter operations have been deprecated for bin/kafka-topics.sh:
+bin/kafka-configs.sh --zookeeper <zk_host> --alter --entity-type topics --entity-name test_topic --add-config retention.ms=86400000
+
+Q. how to flush data form kafka?
+Default period is 1 week. and if you want ot flush out data, we can do it in following ways:
+
+1. flush entire messages for topic , we can delete the topic.
+
+bin/kafka-topics.sh --zookeeper localhost:2181 --delete --topic topicname
+2. flush message from kafka queue, we can delete the data from kafka servers log. refer below link
+
+https://community.cloudera.com/t5/Support-Questions/How-to-clean-up-purge-Kafka-queues/td-p/95721
+
