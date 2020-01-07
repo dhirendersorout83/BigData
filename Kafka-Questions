@@ -40,3 +40,6 @@ Q. If we have multiple partitions and while producing we dont pass partition tha
 Q. what is the logic to chose partiton nos?
 
 Q. how to map partitions to comsumers?
+
+Q. hoe to run multiple consumer threads in kafka for topic?
+link https://dzone.com/articles/kafka-consumer-and-multi-threading
