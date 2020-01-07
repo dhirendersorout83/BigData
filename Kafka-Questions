@@ -59,3 +59,4 @@ while (true) {
         log.error("commit failed", e) 3
     }
 }
+The drawback is that while commitSync() will retry the commit until it either succeeds or encounters a nonretriable failure, commitAsync() will not retry. The reason it does not retry is that by the time commitAsync() receives a response from the server, there may have been a later commit that was already successful.
