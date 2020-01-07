@@ -35,3 +35,8 @@ bin/kafka-topics.sh --zookeeper localhost:2181 --delete --topic topicname
 
 https://community.cloudera.com/t5/Support-Questions/How-to-clean-up-purge-Kafka-queues/td-p/95721
 
+Q. If we have multiple partitions and while producing we dont pass partition than in which partition message would land?
+
+Q. what is the logic to chose partiton nos?
+
+Q. how to map partitions to comsumers?
