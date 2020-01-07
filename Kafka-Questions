@@ -43,3 +43,19 @@ Q. how to map partitions to comsumers?
 
 Q. hoe to run multiple consumer threads in kafka for topic?
 link https://dzone.com/articles/kafka-consumer-and-multi-threading
+
+Q. how to commitCurrent to commit offset
+while (true) {
+    ConsumerRecords<String, String> records = consumer.poll(100);
+    for (ConsumerRecord<String, String> record : records) {
+        System.out.printf("topic = %s, partition = %d, offset =
+            %d, customer = %s, country = %s\n",
+            record.topic(), record.partition(),
+            record.offset(), record.key(), record.value()); 1
+    }
+    try {
+        consumer.commitSync(); 2
+    } catch (CommitFailedException e) {
+        log.error("commit failed", e) 3
+    }
+}
