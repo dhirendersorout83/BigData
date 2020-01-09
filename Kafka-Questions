@@ -100,3 +100,75 @@ while (true) {
         count++;
     }
 }
+1.This is the map we will use to manually track offsets.
+2.Remember, println is a stand-in for whatever processing you do for the records you consume.
+3.After reading each record, we update the offsets map with the offset of the next message we expect to process. The committed offset should always be the offset of the next message that your application will read. This is where we’ll start reading next time we start.
+4.Here, we decide to commit current offsets every 1,000 records. In your application, you can commit based on time or perhaps content of the records.
+5.I chose to call commitAsync(), but commitSync() is also completely valid here. Of course, when committing specific offsets you still need to perform all the error handling we’ve seen in previous sections.
+
+Q. How to execute our code when we subscribe/unsubscribe/pause any topic/partition?
+
+Q. Consuming Records with Specific Offsets?
+poll() to start consuming messages from the last committed offset in each partition and to proceed in processing all messages in sequence. However, sometimes you want to start reading at a different offset.
+
+If you want to start reading all messages from the beginning of the partition, or you want to skip all the way to the end of the partition and start consuming only new messages, there are APIs specifically for that: seekToBeginning(Collection<TopicPartition> tp) and seekToEnd(Collection<TopicPartition> tp).
+
+However, the Kafka API also lets you seek a specific offset. This ability can be used in a variety of ways; for example, to go back a few messages or skip ahead a few messages (perhaps a time-sensitive application that is falling behind will want to skip ahead to more relevant messages). The most exciting use case for this ability is when offsets are stored in a system other than Kafka.
+
+Think about this common scenario: Your application is reading events from Kafka (perhaps a clickstream of users in a website), processes the data (perhaps remove records that indicate clicks from automated programs rather than users), and then stores the results in a database, NoSQL store, or Hadoop. Suppose that we really don’t want to lose any data, nor do we want to store the same results in the database twice.
+
+In these cases, the consumer loop may look a bit like this:
+while (true) {
+    ConsumerRecords<String, String> records = consumer.poll(100);
+    for (ConsumerRecord<String, String> record : records) {
+        currentOffsets.put(
+            new TopicPartition(record.topic(), record.partition()),
+            record.offset());
+        processRecord(record);
+        storeRecordInDB(record);
+        consumer.commitAsync(currentOffsets);
+    }
+}
+In this example, we are very paranoid, so we commit offsets after processing each record. However, there is still a chance that our application will crash after the record was stored in the database but before we committed offsets, causing the record to be processed again and the database to contain duplicates.
+This could be avoided if there was a way to store both the record and the offset in one atomic action. Either both the record and the offset are committed, or neither of them are committed. As long as the records are written to a database and the offsets to Kafka, this is impossible.
+
+But what if we wrote both the record and the offset to the database, in one transaction? Then we’ll know that either we are done with the record and the offset is committed or we are not and the record will be reprocessed.
+Now the only problem is if the offset is stored in a database and not in Kafka, how will our consumer know where to start reading when it is assigned a partition? This is exactly what seek() can be used for. When the consumer starts or when new partitions are assigned, it can look up the offset in the database and seek() to that location.
+
+Here is a skeleton example of how this may work. We use ConsumerRebalanceLister and seek() to make sure we start processing at the offsets stored in the database:
+public class SaveOffsetsOnRebalance implements ConsumerRebalanceListener {
+
+    public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+        commitDBTransaction(); 1
+    }
+
+    public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
+        for(TopicPartition partition: partitions)
+            consumer.seek(partition, getOffsetFromDB(partition)); 2
+    }
+}
+
+
+consumer.subscribe(topics, new SaveOffsetOnRebalance(consumer));
+consumer.poll(0);
+
+for (TopicPartition partition: consumer.assignment())
+    consumer.seek(partition, getOffsetFromDB(partition));   3
+
+while (true) {
+    ConsumerRecords<String, String> records =
+        consumer.poll(100);
+    for (ConsumerRecord<String, String> record : records) {
+        processRecord(record);
+        storeRecordInDB(record);
+        storeOffsetInDB(record.topic(), record.partition(),
+            record.offset()); 4
+    }
+    commitDBTransaction();
+}
+1.We use an imaginary method here to commit the transaction in the database. The idea here is that the database records and offsets will be inserted to the database as we process the records, and we just need to commit the transactions when we are about to lose the partition to make sure this information is persisted.
+2.We also have an imaginary method to fetch the offsets from the database, and then we seek() to those records when we get ownership of new partitions.
+3.When the consumer first starts, after we subscribe to topics, we call poll() once to make sure we join a consumer group and get assigned partitions, and then we immediately seek() to the correct offset in the partitions we are assigned to. Keep in mind that seek() only updates the position we are consuming from, so the next poll() will fetch the right messages. If there was an error in seek() (e.g., the offset does not exist), the exception will be thrown by poll().
+4.Another imaginary method: this time we update a table storing the offsets in our database. Here we assume that updating records is fast, so we do an update on every record, but commits are slow, so we only commit at the end of the batch. However, this can be optimized in different ways.
+
+There are many different ways to implement exactly-once semantics by storing offsets and data in an external store, but all of them will need to use the ConsumerRebalanceListener and seek() to make sure offsets are stored in time and that the consumer starts reading messages from the correct location.
