@@ -76,3 +76,27 @@ while (true) {
         }
     }); 1
 }
+
+Q. How to commit a partitcular offset instead of calling commitSync() for all the offsets return by poll()?
+Fortunately, the consumer API allows you to call commitSync() and commitAsync() and pass a map of partitions and offsets that you wish to commit. If you are in the middle of processing a batch of records, and the last message you got from partition 3 in topic “customers” has offset 5000, you can call commitSync() to commit offset 5001 for partition 3 in topic “customers.” Since your consumer may be consuming more than a single partition, you will need to track offsets on all of them, which adds complexity to your code.
+private Map<TopicPartition, OffsetAndMetadata> currentOffsets =
+    new HashMap<>(); 1
+int count = 0;
+
+....
+
+while (true) {
+    ConsumerRecords<String, String> records = consumer.poll(100);
+    for (ConsumerRecord<String, String> record : records) {
+        System.out.printf("topic = %s, partition = %s, offset = %d,
+            customer = %s, country = %s\n",
+            record.topic(), record.partition(), record.offset(),
+            record.key(), record.value()); 2
+        currentOffsets.put(
+            new TopicPartition(record.topic(), record.partition()),
+            new OffsetAndMetadata(record.offset()+1, "no metadata")); 3
+        if (count % 1000 == 0)   4
+            consumer.commitAsync(currentOffsets, null); 5
+        count++;
+    }
+}
