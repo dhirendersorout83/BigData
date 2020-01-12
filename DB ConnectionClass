@@ -1,0 +1,32 @@
+public class ConnectionT {
+        
+        public static Connection getConnection(){
+            try {
+
+                Class.forName("oracle.jdbc.driver.OracleDriver");
+
+            } catch (ClassNotFoundException e) {
+
+                System.out.println("Where is your Oracle JDBC Driver?");
+                e.printStackTrace();
+                return null;
+
+            }
+            Connection _connection = null;
+
+            try {
+
+                //_connection = DriverManager.getConnection(
+                 //       "jdbc:oracle:thin:@172.30.112.124:1551:AUTD3", "apps", "autd3apps");
+                _connection = DriverManager.getConnection(
+                        "jdbc:oracle:thin:@172.30.128.29:1561:AUTS", "apps", "autsapps0118");
+
+            } catch (SQLException e) {
+
+                System.out.println("Connection Failed! Check output console");
+                e.printStackTrace();
+                return null;
+
+            }
+            return _connection;
+        }
