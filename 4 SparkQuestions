@@ -74,3 +74,33 @@ A full data shuffle is an expensive operation for large data sets, but our data 
 Actual performance improvement
 It took 241 seconds to count the rows in the data puddle when the data wasn’t repartitioned (on a 5 node cluster). It only took 2 seconds to count the data puddle when the data was partitioned — that’s a 124x speed improvement!
 
+
+Q. Apache Storm vs Spark Streaming
+===========================================
+i. Processing Model
+Storm: It supports true stream processing model through core storm layer.
+Spark Streaming: Apache Spark Streaming is a wrapper over Spark batch processing.
+
+ii. Primitives
+Storm: It provides a very rich set of primitives to perform tuple level process at intervals of a stream (filters, functions). Aggregations over messages in a stream are possible through group by semantics. It supports left join, right join, inner join (default) across the stream.
+Spark Streaming: It provides 2 wide varieties of operators. First is Stream transformation operators that transform one DStream into another DStream. Second is output operators that write information to external systems. The previous includes stateless operators (filter, map, mapPartitions, union, distinct than on) still as stateful window operators (countByWindow, reduceByWindow then on).
+
+iii. State Management
+Storm: Core Storm by default doesn’t offer any framework level support to store any intermediate bolt output (the result of user operation) as a state. Hence, any application has to create/update its own state as and once required.
+Spark Streaming: The underlying Spark by default treats the output of every RDD operation(Transformations and Actions) as an intermediate state. It stores it as RDD. Spark Streaming permits maintaining and changing state via updateStateByKey API. A pluggable method couldn’t be found to implement state within the external system.
+
+iv. Message Delivery Guarantees (Handling message level failures)
+Storm: It supports 3 message processing guarantees: at least once, at-most-once and exactly once. Storm’s reliability mechanisms are distributed, scalable, and fault-tolerant.
+Spark Streaming: Apache Spark Streaming defines its fault tolerance semantics, the guarantees provided by the recipient and output operators. As per the Apache Spark architecture, the incoming data is read and replicated in different Spark executor’s nodes. This generates failure scenarios data received but may not be reflected. It handles fault tolerance differently in the case of worker failure and driver failure.
+
+v. Fault Tolerance (Handling process/node level failures)
+Storm: Storm is intended with fault-tolerance at its core. Storm daemons (Nimbus and Supervisor) are made to be fail-fast (that means that method self-destructs whenever any sudden scenario is encountered) and stateless (all state is unbroken in Zookeeper or on disk).
+Spark Streaming: The Driver Node (an equivalent of JT) is SPOF. If driver node fails, then all executors will be lost with their received and replicated in-memory information. Hence, Spark Streaming uses data checkpointing to get over from driver failure.
+
+link for details
+https://data-flair.training/blogs/apache-storm-vs-spark-streaming/
+
+3. Conclusion – Apache Storm vs Spark Streaming
+Hence, the difference between Apache Storm vs Spark Streaming shows that Apache Storm is a solution for real-time stream processing. But Storm is very complex for developers to develop applications. Very few resources available in the market for it.
+Storm can solve only one type of problem i.e Stream processing. But the industry needs a generalized solution which can solve all the types of problems. For example Batch processing, stream processing interactive processing as well as iterative processing. Here Apache Spark comes into limelight which is a general purpose computation engine. It can handle any type of problem. Apart from this Apache Spark is much too easy for developers and can integrate very well with Hadoop.
+
