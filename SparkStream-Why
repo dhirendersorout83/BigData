@@ -1,0 +1,6 @@
+Why we need spark stream as we are having other tehnologies
+SparkStream handle the straggler node very well. straggler node are those which are slow and responsible for slow data movement in cluster.
+
+Spark stream use the same engine for batch and strream processing, so it benefit , we can process batch and stream in same program.
+
+data breaks in rdd's and task assign to diff node/machines. data assign most frequently to faster node as compare to straggler nodes.
