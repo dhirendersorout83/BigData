@@ -12,6 +12,21 @@ check existing topic:
 >sudo -s
 >bin/kafka-topics.sh --list --zookeeper localhost:2181
 
+start slasticsearch
+----------------------
+sudo su  
+ulimit -n 65536
+sudo sysctl -w vm.max_map_count=262144
+su ec2-user
+ > bin/elasticsearch
+ Note: You cannot start the Elasticsearch service as a root user, so you have to run bin/elasticsearch command as an ec2-user.
+
+
+start kanban
+------------------
+>bin/kibana
+test: kibana run by default on port 5601. try http://publicip:5601
+
 create topic:
 >bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partition 1 --topic upgrad-kafka-topic
 
