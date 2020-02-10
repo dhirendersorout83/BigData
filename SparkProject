@@ -8,6 +8,7 @@ val streamInputDF = sparksession.readStream
 .load()
 
 Streaming ETL
+=======================-==========================================================
 Now that the stream is set up, we can start doing the required ETL on it to extract meaningful insights. Notice that streamingInputDF is a DataFrame. Since DataFrames are essentially an untyped Dataset of rows, we can perform similar operations to them.
 
 val streamingSelectDF = 
@@ -19,6 +20,7 @@ streamInputDF
 display(streamingSelectDF)
 
 Windowing
+=======================-==========================================================
 Now that we have parse, select, groupBy and count queries continuously executing, what if we want to find out traffic per zip code for a 10 minute window interval, with sliding duration of 5 minutes starting 2 minutes past the hour?
 
 In this case, the incoming JSON contains timestamp in ‘hittime,’ so let’s use that to query the traffic per each 10 minute window.
@@ -35,3 +37,53 @@ streamInputDF
 .count()
 
 display(streamingSelectDF)
+
+Output Options
+=======================-==========================================================
+So far, we have seen the end results being displayed automatically. If we want more control in terms output options, there are a variety of output modes available. For instance, if we need to debug, you may wish to select the console output. If we need to be able to query the dataset interactively as data is being consumed, the memory output would be an ideal choice. Similarly, the output can be written to files, external databases, or even streamed back to Kafka.
+Let’s go over these options in detail.
+
+Memory
+------------------------------------
+In this scenario, data is stored as an in-memory table. From here, users are able to query the dataset using SQL. The name of the table is specified from the queryName option. Note we continue to use streamingSelectDF from the above windowing example.
+
+> import org.apache.spark.sql.streaming.ProcessingTime
+val query = streamingSelectDF
+.writeStream
+.format("memory")
+.queryName("isphite")
+.outputMode("complete")
+.trigger(ProcessingTime("25 seconds"))
+.start()
+
+Console
+-----------------------------------------------
+In this scenario, output is printed to console/stdout log.
+
+> import org.apache.spark.sql.streaming.ProcessingTime
+val query = streamingSelectDF
+.writeStream
+.format("console")
+.outputMode("complete")
+.trigger(ProcessingTime("25 seconds"))
+.start()
+
+
+File
+---------------------------------------------------
+This scenario is ideal for long-term persistence of output. Unlike memory and console sinks, files and directories are fault-tolerant. As such, this option requires a checkpoint directory, where state is maintained for fault-tolerance.
+> import org.apache.spark.sql.streaming.ProcessingTime
+val query = streamingSelectDF
+.writeStream
+.format("parquet")
+.option("path","/home/output")
+.option("checkpointLocation","/home/output/check")
+.trigger(ProcessingTime("25 seconds"))
+.start()
+
+Once the data is saved, it can be queried as one would do in Spark with any other dataset.
+val data = spark.read.parquet("/home/output")
+data.filter($"zip" === "12345").count()
+
+
+
