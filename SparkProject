@@ -18,3 +18,20 @@ streamInputDF
 
 display(streamingSelectDF)
 
+Windowing
+Now that we have parse, select, groupBy and count queries continuously executing, what if we want to find out traffic per zip code for a 10 minute window interval, with sliding duration of 5 minutes starting 2 minutes past the hour?
+
+In this case, the incoming JSON contains timestamp in ‘hittime,’ so let’s use that to query the traffic per each 10 minute window.
+
+Note that in Structured Streaming, windowing is considered a groupBy operation. The pie charts below represents each 10 minute window.
+
+> import org.apache.spark.sql.functions._
+
+val streamingSelectDf=
+streamInputDF
+.select(get_json_object(($"value").cast("string"),$"zip").alias("zip")
+         ,get_json_object(($"value").cast("string"),$"hittime").alias("hittime") )
+.groupBy($"zip",window($"hittime".cast("timestamp"),"10 minute","5 minute","2 minute"))
+.count()
+
+display(streamingSelectDF)
