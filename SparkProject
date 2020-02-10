@@ -1,0 +1,20 @@
+https://databricks.com/blog/2017/04/04/real-time-end-to-end-integration-with-apache-kafka-in-apache-sparks-structured-streaming.html
+
+// spark session to create stream
+val streamInputDF = sparksession.readStream
+.format("kafka")
+.option("kafka.bootstrap.servers","<ip>:<port>,<ip>:<port>,<ip>:<port>")
+.option("subscribe","<topic>")
+.load()
+
+Streaming ETL
+Now that the stream is set up, we can start doing the required ETL on it to extract meaningful insights. Notice that streamingInputDF is a DataFrame. Since DataFrames are essentially an untyped Dataset of rows, we can perform similar operations to them.
+
+val streamingSelectDF = 
+streamInputDF
+.select(get_json_object(($"value").cast("string"),$"zip").alias("countByZip"))
+.groupBy($"countByZip")
+.count()
+
+display(streamingSelectDF)
+
