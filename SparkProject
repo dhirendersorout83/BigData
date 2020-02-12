@@ -1,5 +1,8 @@
 https://databricks.com/blog/2017/04/04/real-time-end-to-end-integration-with-apache-kafka-in-apache-sparks-structured-streaming.html
 
+Kafka-demo link:
+https://github.com/jainsourabh2/kafka-tutorials
+
 // spark session to create stream
 val streamInputDF = sparksession.readStream
 .format("kafka")
@@ -35,6 +38,12 @@ streamInputDF
          ,get_json_object(($"value").cast("string"),$"hittime").alias("hittime") )
 .groupBy($"zip",window($"hittime".cast("timestamp"),"10 minute","5 minute","2 minute"))
 .count()
+
+Sample Program Link to read kafka stream
+========================================
+https://gist.github.com/sdpatil/0ce18ccd7aeb857eb8c851d4e4bf0ac7
+
+
 
 display(streamingSelectDF)
 
