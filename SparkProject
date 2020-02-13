@@ -95,4 +95,12 @@ val data = spark.read.parquet("/home/output")
 data.filter($"zip" === "12345").count()
 
 
+Class to maintain average
+===========================
+public class Average{
+	private static final serialVersionUID=0L;
+	private long count;
+	private long sum;
+}
+
 
