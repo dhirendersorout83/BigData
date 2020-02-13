@@ -4,6 +4,8 @@ Kafka-demo link:
 https://github.com/jainsourabh2/kafka-tutorials
 //average in scala
 https://github.com/rshepherd/spark-streaming-average/blob/master/src/main/scala/StreamingAverage.scala
+// updatebykey example
+https://gist.github.com/yuemingl/9f29cf6d04ef396f5176549b6ab319bc
 
 // spark session to create stream
 val streamInputDF = sparksession.readStream
