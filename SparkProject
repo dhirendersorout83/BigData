@@ -2,6 +2,8 @@ https://databricks.com/blog/2017/04/04/real-time-end-to-end-integration-with-apa
 
 Kafka-demo link:
 https://github.com/jainsourabh2/kafka-tutorials
+//average in scala
+https://github.com/rshepherd/spark-streaming-average/blob/master/src/main/scala/StreamingAverage.scala
 
 // spark session to create stream
 val streamInputDF = sparksession.readStream
