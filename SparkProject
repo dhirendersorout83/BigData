@@ -6,6 +6,7 @@ https://github.com/jainsourabh2/kafka-tutorials
 https://github.com/rshepherd/spark-streaming-average/blob/master/src/main/scala/StreamingAverage.scala
 // updatebykey example
 https://gist.github.com/yuemingl/9f29cf6d04ef396f5176549b6ab319bc
+http://timepasstechies.com/spark-file-streaming-with-sliding-window-to-calculate-the-simple-moving-average-using-reducebykeyandwindow/
 
 // spark session to create stream
 val streamInputDF = sparksession.readStream
