@@ -13,3 +13,16 @@ SparkStream follow micro batch processing
 
 Characteristics of Real-Time Stream Processing
 ==================================================
+
+Read Json from kafka and do the processing as DataFram:
+val sqlContext = new SQLContext(sc)
+val stream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
+                  ssc, kafkaParams, Set("myTopicName"))
+
+stream.foreachRDD(
+  rdd => {
+     val dataFrame = sqlContext.read.json(rdd.map(_._2)) //converts json to DF
+     //do your operations on this DF. You won't even require a model class.
+        })
+        
+
