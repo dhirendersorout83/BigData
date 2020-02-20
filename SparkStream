@@ -1,5 +1,5 @@
 Stream Processing Technic:
-
+link - https://blog.yuvalitzchakov.com/exploring-stateful-streaming-with-spark-structured-streaming/
 Tuple at-a-time processing: This processing is also referred to as ‘tuple at-a-time processing’. In tuple at-a-time processing, data flows in the form a stream, where a stream is an unordered sequence of various tuples. Each event generates specific data that is represented as a tuple and is moved across systems as a stream of data. In such type of processing, the events are handled instantly as the tuples arrive.
 
  
