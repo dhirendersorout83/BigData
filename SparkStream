@@ -39,3 +39,6 @@ val kafkaParams = Map[String, String](...here are your params...)
 KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
   ssc, kafkaParams, Set("myTopicName"))
   .map(m => Json.parse(m._2).as[MyClass])
+-------------------
+For complete reference check below link
+https://github.com/trK54Ylmz/kafka-spark-streaming-example/blob/master/streaming/src/main/scala/com/test/App.scala
