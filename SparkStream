@@ -24,5 +24,18 @@ stream.foreachRDD(
      val dataFrame = sqlContext.read.json(rdd.map(_._2)) //converts json to DF
      //do your operations on this DF. You won't even require a model class.
         })
-        
+-----------
+> use Play Framework's library for Json.
+-------------
+import play.api.libs.json._
+import org.apache.spark.streaming.kafka.KafkaUtils
 
+case class MyClass(field1: String,
+                   field2: Int)
+
+implicit val myClassFormat = Json.format[MyClass]
+
+val kafkaParams = Map[String, String](...here are your params...)    
+KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
+  ssc, kafkaParams, Set("myTopicName"))
+  .map(m => Json.parse(m._2).as[MyClass])
